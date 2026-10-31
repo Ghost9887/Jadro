@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "token.h"
 
 void print_help();
 void repl();
@@ -15,6 +16,16 @@ int main(int argc, const char** argv) {
     }else {
         print_help();
     }
+
+    Token test = (Token) {
+        .line = 1,
+        .col = 23,
+        .lexeme = "3.12",
+        .value = (Value) { .tag = TAG_DOUBLE, .as = { .d = 3.12 } }
+    };
+    
+    //Token[1 | 23 | '3.12']
+    print_token(&test);
 
     return 0;
 }
