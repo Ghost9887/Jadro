@@ -58,11 +58,13 @@ char* token_type_to_string(TokenType type) {
         case TOKEN_DOT: return "DOT";
         case TOKEN_COMMA: return "COMMA";
         case TOKEN_STRING: return "STRING";
+        case TOKEN_CHAR: return "CHAR";
         case TOKEN_INTEGER: return "INTEGER";
         case TOKEN_DOUBLE: return "DOUBLE";
         case TOKEN_BOOLEAN: return "BOOLEAN";
         case TOKEN_IDENTIFIER: return "IDENTIFIER";
         case TOKEN_PREM: return "PREM";
+        case TOKEN_VYTLAC: return "VYTLAC";
         case TOKEN_AK: return "AK";
         case TOKEN_INAK: return "INAK";
         case TOKEN_POKIAL: return "POKIAL";
@@ -75,53 +77,57 @@ char* token_type_to_string(TokenType type) {
 
 void print_token(const Token* token) {
     if (token->value.tag == TAG_NIL) {
-        printf("Token[ type: %s, line: %u | col: %u | len: %u | lexeme: '%.*s' ]\n", 
+        printf("Token[ type: %s, line: %u | col: %u | lexeme: \"%.*s\" ]\n", 
             token_type_to_string(token->type),
             token->line,
             token->col,
-            token->len,
-            token->len,
-            token->lexeme
+            token->lexeme.len,
+            token->lexeme.ptr
         ); 
     }else if (token->value.tag == TAG_STRING) {
-        printf("Token[ type: %s, line: %u | col: %u | len: %u | lexeme: '%.*s' | value: '%.*s' ]\n", 
+        printf("Token[ type: %s, line: %u | col: %u | lexeme: \"%.*s\" | value: \"%.*s\" ]\n", 
             token_type_to_string(token->type),
             token->line,
             token->col,
-            token->len,
-            token->len,
-            token->lexeme,
+            token->lexeme.len,
+            token->lexeme.ptr,
             token->value.as.s.len,
             token->value.as.s.ptr
         );
-    }else if (token->value.tag == TAG_INTEGER) {
-        printf("Token[ type: %s, line: %u | col: %u | len: %u | lexeme: '%.*s' | value: %d ]\n", 
+    }else if (token->value.tag == TAG_CHAR) {
+        printf("Token[ type: %s, line: %u | col: %u | lexeme: \"%.*s\" | value: '%c' ]\n", 
             token_type_to_string(token->type),
             token->line,
             token->col,
-            token->len,
-            token->len,
-            token->lexeme,
+            token->lexeme.len,
+            token->lexeme.ptr,
+            token->value.as.c
+        );
+    }else if (token->value.tag == TAG_INTEGER) {
+        printf("Token[ type: %s, line: %u | col: %u | lexeme: \"%.*s\" | value: %d ]\n", 
+            token_type_to_string(token->type),
+            token->line,
+            token->col,
+            token->lexeme.len,
+            token->lexeme.ptr,
             token->value.as.i
         );
     }else if (token->value.tag == TAG_DOUBLE) {
-        printf("Token[ type: %s, line: %u | col: %u | len: %u | lexeme: '%.*s' | value: %f ]\n", 
+        printf("Token[ type: %s, line: %u | col: %u | lexeme: \"%.*s\" | value: %f ]\n", 
             token_type_to_string(token->type),
             token->line,
             token->col,
-            token->len,
-            token->len,
-            token->lexeme,
+            token->lexeme.len,
+            token->lexeme.ptr,
             token->value.as.d
         );
     }else {
-        printf("Token[ type: %s, line: %u | col: %u | len: %u | lexeme: '%.*s' | value: %s ]\n", 
+        printf("Token[ type: %s, line: %u | col: %u | lexeme: \"%.*s\" | value: %s ]\n", 
             token_type_to_string(token->type),
             token->line,
             token->col,
-            token->len,
-            token->len,
-            token->lexeme,
+            token->lexeme.len,
+            token->lexeme.ptr,
             (token->value.as.b) ? "Pravda" : "Nepravda"
         );
     }

@@ -6,7 +6,7 @@
 
 void initialize_lexer(Lexer* lexer, TokenArr* arr, const char* input) {
     lexer->line = 1;
-    lexer->col = 0;
+    lexer->col = 1;
     lexer->start = 0;
     lexer->current = 0;
     lexer->input = input;
@@ -18,6 +18,7 @@ static char advance(Lexer* lexer);
 static bool match(const char c, Lexer* lexer);
 static void make_identifier(Lexer* lexer);
 static void make_digit(Lexer* lexer);
+static void make_char(Lexer* lexer);
 static void make_string(Lexer* lexer);
 static void make_token(TokenType type, Lexer* lexer);
 static void make_token_value(TokenType type, Value value, Lexer* lexer);
@@ -41,16 +42,17 @@ void tokenize(Lexer* lexer) {
             case '/': make_token(TOKEN_SLASH, lexer); break;
             case '*': make_token(TOKEN_STAR, lexer); break;
             case '%': make_token(TOKEN_PERCENT, lexer); break;
+            case ';': make_token(TOKEN_SEMICOLON, lexer); break;
             case '=': make_token(match('=', lexer) ? TOKEN_EQUALS_EQUALS : TOKEN_EQUALS, lexer); break;
             case '>': make_token(match('=', lexer) ? TOKEN_GREATER_EQUALS : TOKEN_GREATER, lexer); break;
             case '<': make_token(match('=', lexer) ? TOKEN_LESSER_EQUALS : TOKEN_LESSER, lexer); break;
             case '!': make_token(match('=', lexer) ? TOKEN_BANG_EQUALS : TOKEN_BANG, lexer); break;
-            case '\n': lexer->line++; lexer->col = 0; break;
+            case '\n': lexer->line++; lexer->col = 1; break;
             case ' ':
             case '\t':
-            case '\r':
-                break;          
+            case '\r': break;          
             case '"': make_string(lexer); break;
+            case '\'': make_char(lexer); break;
             default: 
                 if (isdigit(c)) {
                     make_digit(lexer);
@@ -69,13 +71,12 @@ static void make_token(TokenType type, Lexer* lexer) {
     Token new_token = (Token) {
         .type = type,
         .line = lexer->line,
-        .col = lexer->col,
-        .len = lexer->current - lexer->start,
-        .lexeme = &lexer->input[lexer->start],
+        .col = lexer->col - (lexer->current - lexer->start),
+        .lexeme = (String) { .len = lexer->current - lexer->start, .ptr = &lexer->input[lexer->start] },
         .value = (Value) { .tag = TAG_NIL, .as = { .n = NULL } }
     };
     
-    reallocate_token_arr(lexer->token_arr);
+    if (!reallocate_token_arr(lexer->token_arr)) exit(1);
     lexer->token_arr->tokens[lexer->token_arr->count++] = new_token;
 }
 
@@ -83,13 +84,12 @@ static void make_token_value(TokenType type, Value value, Lexer* lexer) {
     Token new_token = (Token) {
         .type = type,
         .line = lexer->line,
-        .col = lexer->col,
-        .len = lexer->current - lexer->start,
-        .lexeme = &lexer->input[lexer->start],
+        .col = lexer->col - (lexer->current - lexer->start),
+        .lexeme = (String) { .len = lexer->current - lexer->start, .ptr = &lexer->input[lexer->start] },
         .value = value
     };
     
-    reallocate_token_arr(lexer->token_arr);
+    if (!reallocate_token_arr(lexer->token_arr)) exit(1);
     lexer->token_arr->tokens[lexer->token_arr->count++] = new_token;
 }
 
@@ -101,8 +101,10 @@ static TokenType check_keyword(const char* identifier) {
     if (memcmp("prem", identifier, 4) == 0) return TOKEN_PREM; 
     else if (memcmp("ak", identifier, 2) == 0) return TOKEN_AK;
     else if (memcmp("inak", identifier, 4) == 0) return TOKEN_INAK;
-
-    return TOKEN_IDENTIFIER;
+    else if (memcmp("pre", identifier, 3) == 0) return TOKEN_PRE;
+    else if (memcmp("pokial", identifier, 6) == 0) return TOKEN_POKIAL;
+    else if (memcmp("vytlac", identifier, 6) == 0) return TOKEN_VYTLAC;
+    else return TOKEN_IDENTIFIER;
 }
 
 static void make_identifier(Lexer* lexer) {
@@ -111,8 +113,16 @@ static void make_identifier(Lexer* lexer) {
     while (!is_at_end(lexer) && (isalnum(peek(lexer)) || peek(lexer) == '_')) advance(lexer);
     
     identifier = &lexer->input[lexer->start];
-
-    make_token(check_keyword(identifier), lexer);
+    
+    if (memcmp("pravda", identifier, 6) == 0) {
+        Value new_value = (Value) { .tag = TAG_BOOLEAN, .as = { .b = true } };
+        make_token_value(TOKEN_BOOLEAN, new_value, lexer);
+    }else if (memcmp("nepravda", identifier, 8) == 0) {
+        Value new_value = (Value) { .tag = TAG_BOOLEAN, .as = { .b = false } };
+        make_token_value(TOKEN_BOOLEAN, new_value, lexer);
+    }else {
+        make_token(check_keyword(identifier), lexer);
+    }
 }
 
 static void make_digit(Lexer* lexer) {
@@ -143,20 +153,38 @@ static void make_digit(Lexer* lexer) {
     make_token_value(decimal ? TOKEN_DOUBLE : TOKEN_INTEGER, new_value, lexer);
 }
 
+static void make_char(Lexer* lexer) {
+    lexer->start = lexer->current;
+    unsigned int count = 0;
+
+    while (!is_at_end(lexer) && peek(lexer) != '\'') {
+        count++;
+        advance(lexer);
+    }
+
+    if (count == 1) {
+        Value new_value = { .tag = TAG_CHAR, .as = { .c = lexer->input[lexer->start] } };
+        make_token_value(TOKEN_CHAR, new_value, lexer);
+    }else {
+        make_token(TOKEN_UKNOWN, lexer);
+    }
+    
+    advance(lexer);
+}
+
 static void make_string(Lexer* lexer) {
     lexer->start = lexer->current;
 
-    while (!is_at_end(lexer) && advance(lexer) != '"');
+    while (!is_at_end(lexer) && peek(lexer) != '"') advance(lexer);
 
-    lexer->current--;
     Value new_value = (Value) {
         .tag = TAG_STRING,
-        .as = { .s = { .len = (lexer->current - lexer->start), .ptr = &lexer->input[lexer->start] } }
+        .as = { .s = (String) { .len = (lexer->current - lexer->start), .ptr = &lexer->input[lexer->start] } }
     };
 
     
     make_token_value(TOKEN_STRING, new_value, lexer);
-    lexer->current++;
+    advance(lexer);
 }
 
 static char advance(Lexer* lexer) {
@@ -166,7 +194,7 @@ static char advance(Lexer* lexer) {
 
 static bool match(const char c, Lexer* lexer) {
     if (peek(lexer) == c) {
-        lexer->current++;
+        advance(lexer);
         return true;
     }
 
