@@ -2,84 +2,54 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "token.h"
+#include "jadro.h"
 
 void print_help();
-void repl();
-void read_file(const char* file_path);
+char* read_file(const char* file_path);
 
 int main(int argc, const char** argv) {
-    if (argc == 1) {
-        repl();
-    }else if (argc == 2) {
-        read_file(argv[1]);
-    }else {
+    if (argc != 2) {
         print_help();
+        return 1;
     }
 
-    Token test = (Token) {
-        .line = 1,
-        .col = 23,
-        .lexeme = "3.12",
-        .value = (Value) { .tag = TAG_DOUBLE, .as = { .d = 3.12 } }
-    };
-    
-    //Token[1 | 23 | '3.12']
-    print_token(&test);
+    char* input = read_file(argv[1]);
+    if (input == NULL) return 1;
+
+    run(input);
+    free(input);
 
     return 0;
 }
 
-void repl() {
-    char input[1024] = {0};
-
-    printf("Pre ukonecnie zadajte 'koniec' alebo 'q'\n");
-    while (true) {
-        printf("> ");
-        if (fgets(input, sizeof(input), stdin) == NULL) {
-            printf("Nedalo sa nacitat input\n");
-            continue;
-        }
-
-        if (input[strcspn(input, "\n")] == '\0') {
-            printf("Input je priliz velky\n");
-            while (getchar() != '\n');
-            continue;
-        } 
-        input[strcspn(input, "\n")] = '\0';
-        if (strcmp(input, "koniec") == 0 || strcmp(input, "q") == 0) 
-            break;
-
-        printf("%s\n", input);
-    }
-}
-
-void read_file(const char* file_path) {
+char* read_file(const char* file_path) {
     FILE* file = fopen(file_path, "r");
-    if (file == NULL) 
-        goto open_error;
+    if (file == NULL) {
+        printf("Subor '%s' sa nepodaril otvorit\n", file_path);
+        return NULL;
+    }
 
     fseek(file, 0, SEEK_END);
     size_t size = ftell(file);
     rewind(file);
 
     char* input = (char*)malloc(size + 1);
+    if (input == NULL) {
+        printf("Nepodarilo sa alokovať pamäť\n");
+        fclose(file);
+        return NULL;
+    }
+    
+    size_t bytes_read = fread(input, 1, size, file);
+    if (bytes_read != size) {
+        printf("Subor '%s' sa nepodarilo precitat\n", file_path);
+        fclose(file);
+        return NULL;
+    }
+    input[size] = '\0';
 
-    if (fgets(input, size, file) == NULL) 
-        goto read_error;
-
-    printf("%s\n", input);
-    free(input);
-    return;
-
-open_error:
-    printf("Subor '%s' sa nepodaril otvorit\n", file_path);
-    return;
-
-read_error:
-    printf("Subor '%s' sa nepodarilo nacitat\n", file_path);
-    free(input);
-    return;
+    fclose(file);
+    return input;
 }
 
 void print_help() {

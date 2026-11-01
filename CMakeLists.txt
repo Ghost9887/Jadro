@@ -7,7 +7,9 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(SOURCES
     src/main.c
+    src/jadro.c
     src/token.c
+    src/lexer.c
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

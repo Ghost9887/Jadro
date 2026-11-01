@@ -15,7 +15,10 @@ typedef struct {
     Tag tag;
     union {
         void* n;
-        char* s;
+        struct {
+            unsigned int len;
+            const char* ptr;
+        }s;
         int i;
         double d;
         bool b;
