@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 void initialize_lexer(Lexer* lexer, TokenArr* arr, const char* input) {
     lexer->line = 1;
@@ -15,6 +16,7 @@ void initialize_lexer(Lexer* lexer, TokenArr* arr, const char* input) {
 static bool is_at_end(Lexer* lexer);
 static char advance(Lexer* lexer);
 static bool match(const char c, Lexer* lexer);
+static void make_identifier(Lexer* lexer);
 static void make_digit(Lexer* lexer);
 static void make_string(Lexer* lexer);
 static void make_token(TokenType type, Lexer* lexer);
@@ -53,6 +55,8 @@ void tokenize(Lexer* lexer) {
                 if (isdigit(c)) {
                     make_digit(lexer);
                     break;
+                }else if(isalpha(c) || c == '_') {
+                    make_identifier(lexer);
                 }else {
                     make_token(TOKEN_UKNOWN, lexer); 
                     break;
@@ -91,6 +95,24 @@ static void make_token_value(TokenType type, Value value, Lexer* lexer) {
 
 static char peek(Lexer* lexer) {
     return lexer->input[lexer->current];
+}
+
+static TokenType check_keyword(const char* identifier) {
+    if (memcmp("prem", identifier, 4) == 0) return TOKEN_PREM; 
+    else if (memcmp("ak", identifier, 2) == 0) return TOKEN_AK;
+    else if (memcmp("inak", identifier, 4) == 0) return TOKEN_INAK;
+
+    return TOKEN_IDENTIFIER;
+}
+
+static void make_identifier(Lexer* lexer) {
+    const char* identifier;
+
+    while (!is_at_end(lexer) && (isalnum(peek(lexer)) || peek(lexer) == '_')) advance(lexer);
+    
+    identifier = &lexer->input[lexer->start];
+
+    make_token(check_keyword(identifier), lexer);
 }
 
 static void make_digit(Lexer* lexer) {

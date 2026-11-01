@@ -7,7 +7,12 @@ bool initialize_token_arr(TokenArr* arr) {
     arr->capacity = 2;
     arr->tokens = (Token*)malloc(sizeof(Token) * arr->capacity);
 
-    return arr->tokens != NULL;
+    if (arr->tokens == NULL) {
+        printf("Nepodarilo sa vytvorit pole\n");
+        return false;
+    }
+
+    return true;
 }
 
 bool reallocate_token_arr(TokenArr* arr) {
@@ -56,6 +61,7 @@ char* token_type_to_string(TokenType type) {
         case TOKEN_INTEGER: return "INTEGER";
         case TOKEN_DOUBLE: return "DOUBLE";
         case TOKEN_BOOLEAN: return "BOOLEAN";
+        case TOKEN_IDENTIFIER: return "IDENTIFIER";
         case TOKEN_PREM: return "PREM";
         case TOKEN_AK: return "AK";
         case TOKEN_INAK: return "INAK";
