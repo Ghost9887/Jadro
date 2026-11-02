@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(jdc)
+project(jdc LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -10,6 +10,8 @@ set(SOURCES
     src/jadro.c
     src/token.c
     src/lexer.c
+    src/stmnt.c
+    src/parser.c
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

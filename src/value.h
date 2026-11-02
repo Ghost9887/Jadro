@@ -15,10 +15,10 @@ typedef enum {
     TAG_INTEGER,
     TAG_DOUBLE,
     TAG_BOOLEAN,
-}Tag;
+}ValueTag;
 
 typedef struct {
-    Tag tag;
+    ValueTag tag;
     union {
         void* n;
         String s;

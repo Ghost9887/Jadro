@@ -8,7 +8,7 @@ bool initialize_token_arr(TokenArr* arr) {
     arr->tokens = (Token*)malloc(sizeof(Token) * arr->capacity);
 
     if (arr->tokens == NULL) {
-        printf("Nepodarilo sa vytvorit pole\n");
+        printf("Nepodarilo sa vytvorit pole Token\n");
         return false;
     }
 

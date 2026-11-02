@@ -11,5 +11,6 @@ typedef struct {
 
 void initialize_lexer(Lexer* lexer, TokenArr* arr, const char* input);
 void tokenize(Lexer* lexer);
+void lexer_test();
 
 #endif

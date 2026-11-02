@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+#include <stdio.h>
 
 void initialize_lexer(Lexer* lexer, TokenArr* arr, const char* input) {
     lexer->line = 1;
@@ -203,4 +205,33 @@ static bool match(const char c, Lexer* lexer) {
 
 static bool is_at_end(Lexer* lexer) {
     return peek(lexer) == '\0';
+}
+
+void lexer_test() {
+    char input[] = "\"Hello, World!\" ( ) , . >= 'a' 391 10.5 pravda";
+    TokenArr arr;
+    initialize_token_arr(&arr);
+
+    Lexer lexer;
+    initialize_lexer(&lexer, &arr, input);
+    tokenize(&lexer);
+
+    TokenType expected[] = { 
+        TOKEN_STRING, 
+        TOKEN_LPAREN, 
+        TOKEN_RPAREN, 
+        TOKEN_COMMA, 
+        TOKEN_DOT, 
+        TOKEN_GREATER_EQUALS, 
+        TOKEN_CHAR,  
+        TOKEN_INTEGER,
+        TOKEN_DOUBLE,
+        TOKEN_BOOLEAN,
+    };
+    
+    assert((10 == arr.count) && "LEXER TEST FAILED");
+    for (int i = 0; i < (int)arr.count; i++) {
+        assert((expected[i] == arr.tokens[i].type) && "LEXER TEST FAILED");
+    }
+    printf("LEXER TEST PASSED\n");
 }
