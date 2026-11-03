@@ -59,6 +59,7 @@ static Expr* equality(Parser* parser) {
 
         expr = binary;
     }
+
     return expr;
 }
 

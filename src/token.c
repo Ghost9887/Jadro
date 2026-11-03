@@ -66,6 +66,7 @@ char* token_type_to_string(TokenType type) {
         case TOKEN_IDENTIFIER: return "IDENTIFIER";
         case TOKEN_PREM: return "PREM";
         case TOKEN_VYTLAC: return "VYTLAC";
+        case TOKEN_NACITAT: return "NACITAT";
         case TOKEN_AK: return "AK";
         case TOKEN_INAK: return "INAK";
         case TOKEN_POKIAL: return "POKIAL";

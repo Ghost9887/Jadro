@@ -105,8 +105,9 @@ static TokenType check_keyword(const char* identifier) {
     else if (memcmp("inak", identifier, 4) == 0) return TOKEN_INAK;
     else if (memcmp("pre", identifier, 3) == 0) return TOKEN_PRE;
     else if (memcmp("pokial", identifier, 6) == 0) return TOKEN_POKIAL;
-    else if (memcmp("vytlac", identifier, 6) == 0) return TOKEN_VYTLAC;
     else if (memcmp("nic", identifier, 3) == 0) return TOKEN_NIL;
+    else if (memcmp("vytlac", identifier, 6) == 0) return TOKEN_VYTLAC;
+    else if (memcmp("nacitat", identifier, 7) == 0) return TOKEN_NACITAT;
     else return TOKEN_IDENTIFIER;
 }
 
