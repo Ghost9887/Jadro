@@ -75,7 +75,7 @@ static void make_token(TokenType type, Lexer* lexer) {
         .line = lexer->line,
         .col = lexer->col - (lexer->current - lexer->start),
         .lexeme = (String) { .len = lexer->current - lexer->start, .ptr = &lexer->input[lexer->start] },
-        .value = (Value) { .tag = TAG_NIL, .as = { .n = NULL } }
+        .value = (Value) { .tag = NIL_VALUE, .as = { .n = NULL } }
     };
     
     if (!reallocate_token_arr(lexer->token_arr)) exit(1);
@@ -106,6 +106,7 @@ static TokenType check_keyword(const char* identifier) {
     else if (memcmp("pre", identifier, 3) == 0) return TOKEN_PRE;
     else if (memcmp("pokial", identifier, 6) == 0) return TOKEN_POKIAL;
     else if (memcmp("vytlac", identifier, 6) == 0) return TOKEN_VYTLAC;
+    else if (memcmp("nic", identifier, 3) == 0) return TOKEN_NIL;
     else return TOKEN_IDENTIFIER;
 }
 
@@ -117,10 +118,10 @@ static void make_identifier(Lexer* lexer) {
     identifier = &lexer->input[lexer->start];
     
     if (memcmp("pravda", identifier, 6) == 0) {
-        Value new_value = (Value) { .tag = TAG_BOOLEAN, .as = { .b = true } };
+        Value new_value = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = true } };
         make_token_value(TOKEN_BOOLEAN, new_value, lexer);
     }else if (memcmp("nepravda", identifier, 8) == 0) {
-        Value new_value = (Value) { .tag = TAG_BOOLEAN, .as = { .b = false } };
+        Value new_value = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = false } };
         make_token_value(TOKEN_BOOLEAN, new_value, lexer);
     }else {
         make_token(check_keyword(identifier), lexer);
@@ -142,12 +143,12 @@ static void make_digit(Lexer* lexer) {
     Value new_value;
     if (decimal) {
         new_value = (Value) { 
-            .tag = TAG_DOUBLE, 
+            .tag = DOUBLE_VALUE, 
             .as = { .d = strtod(&lexer->input[lexer->start], NULL) }
         };
     }else {
         new_value = (Value) {
-            .tag = TAG_INTEGER,
+            .tag = INTEGER_VALUE,
             .as = { .i = atoi(&lexer->input[lexer->start]) }
         };
     }
@@ -165,7 +166,7 @@ static void make_char(Lexer* lexer) {
     }
 
     if (count == 1) {
-        Value new_value = { .tag = TAG_CHAR, .as = { .c = lexer->input[lexer->start] } };
+        Value new_value = { .tag = CHAR_VALUE, .as = { .c = lexer->input[lexer->start] } };
         make_token_value(TOKEN_CHAR, new_value, lexer);
     }else {
         make_token(TOKEN_UKNOWN, lexer);
@@ -180,7 +181,7 @@ static void make_string(Lexer* lexer) {
     while (!is_at_end(lexer) && peek(lexer) != '"') advance(lexer);
 
     Value new_value = (Value) {
-        .tag = TAG_STRING,
+        .tag = STRING_VALUE,
         .as = { .s = (String) { .len = (lexer->current - lexer->start), .ptr = &lexer->input[lexer->start] } }
     };
 

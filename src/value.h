@@ -9,12 +9,12 @@ typedef struct {
 }String;
 
 typedef enum {
-    TAG_NIL,
-    TAG_STRING,
-    TAG_CHAR,
-    TAG_INTEGER,
-    TAG_DOUBLE,
-    TAG_BOOLEAN,
+    NIL_VALUE,
+    STRING_VALUE,
+    CHAR_VALUE,
+    INTEGER_VALUE,
+    DOUBLE_VALUE,
+    BOOLEAN_VALUE,
 }ValueTag;
 
 typedef struct {
@@ -28,5 +28,7 @@ typedef struct {
         bool b;
     }as;
 }Value;
+
+void print_value(const Value* value);
 
 #endif

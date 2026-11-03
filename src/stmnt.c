@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void print_stmnt(Stmnt* stmnt) {
+    switch (stmnt->tag) {
+        case EXPR_STMNT:
+            printf("ExprStmnt[");
+            print_expr(stmnt->as.exp.expr);
+            printf("]\n");
+    }
+}
+
 bool initialize_stmnt_arr(StmntArr* arr) {
     arr->count = 0;
     arr->capacity = 2;

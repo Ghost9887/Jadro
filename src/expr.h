@@ -2,30 +2,40 @@
 #define EXPR_H
 
 #include "value.h"
+#include "token.h"
 
-struct Expr;
+typedef struct Expr Expr;
 
 typedef struct {
     struct Expr* left;
-    char op;
+    Token* op;
     struct Expr* right;
 }BinaryExpr;
+
+typedef struct {
+    Token* op;
+    struct Expr* right;
+}UnaryExpr;
 
 typedef struct {
     Value value;
 }ValueExpr;
 
 typedef enum {
-    EXPR_TAG_BINARY,
-    EXPR_TAG_VALUE
+    BINARY_EXPR,
+    UNARY_EXPR,
+    VALUE_EXPR
 }ExprTag;
 
-typedef struct {
+typedef struct Expr{
     ExprTag tag;
     union {
-        BinaryExpr* b;
-        ValueExpr* v;
+        BinaryExpr bin;
+        UnaryExpr una;
+        ValueExpr val;
     }as;
 }Expr;
+
+void print_expr(Expr* expr);
 
 #endif

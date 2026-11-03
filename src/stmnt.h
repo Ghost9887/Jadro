@@ -9,20 +9,14 @@ typedef struct {
     Expr* expr;
 }ExprStmnt;
 
-typedef struct {
-    struct StmntArr* stmnt_arr;
-}BlockStmnt;
-
 typedef enum {
-    STMNT_TAG_EXPR,
-    STMTN_TAG_BLOCK
+    EXPR_STMNT
 }StmntTag;
 
 typedef struct {
     StmntTag tag;
     union {
-        ExprStmnt* e;
-        BlockStmnt* b;
+        ExprStmnt exp;
     }as;
 }Stmnt;
 
@@ -32,6 +26,7 @@ typedef struct {
     Stmnt* stmnts;
 }StmntArr;
 
+void print_stmnt(Stmnt* stmnt);
 bool initialize_stmnt_arr(StmntArr* arr);
 bool reallocate_stmnt_arr(StmntArr* arr);
 void free_stmnt_arr(StmntArr* arr);

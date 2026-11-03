@@ -9,8 +9,10 @@ set(SOURCES
     src/main.c
     src/jadro.c
     src/token.c
+    src/value.c
     src/lexer.c
     src/stmnt.c
+    src/expr.c
     src/parser.c
 )
 

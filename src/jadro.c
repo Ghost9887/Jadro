@@ -2,6 +2,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 #define DEBUG
 //#define TESTS
@@ -15,6 +16,7 @@ void run(const char* input) {
     initialize_lexer(&lexer, &tokens, input);
     tokenize(&lexer);
 #ifdef DEBUG
+    printf("\n---TOKENS---\n");
     for (int i = 0; i < (int)tokens.count; i++) {
         print_token(&tokens.tokens[i]);
     }
@@ -27,8 +29,15 @@ void run(const char* input) {
     initialize_parser(&parser, &stmnts, lexer.token_arr);
     parse(&parser);
 
-    free_token_arr(&tokens);
-    free_stmnt_arr(&stmnts);
+#ifdef DEBUG
+    printf("\n---AST---\n");
+    for (int i = 0; i < (int)stmnts.count; i++) {
+        print_stmnt(&stmnts.stmnts[i]);
+    }
+#endif
+
+    //free_token_arr(&tokens);
+    //free_stmnt_arr(&stmnts);
 #endif
 
 #ifdef TESTS
