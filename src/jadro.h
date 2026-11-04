@@ -1,6 +1,9 @@
 #ifndef JADRO_H
 #define JADRO_H
 
-void run(const char* input);
+#include "token.h"
+
+void run(char* input);
+void jadro_error(Token* token, const char* message);
 
 #endif

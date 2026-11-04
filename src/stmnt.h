@@ -3,24 +3,50 @@
 
 #include "expr.h"
 
-struct StmntArr;
+typedef struct StmntArr StmntArr;
 
 typedef struct {
     Expr* expr;
 }ExprStmnt;
 
+typedef struct {
+    Expr* expr;
+}PrintStmnt;
+
+typedef struct {
+    StmntArr* stmnts;   
+}BlockStmnt;
+
+typedef struct {
+    String name;
+    Expr* expr;
+}DeclStmnt;
+
+typedef struct {
+    String name;
+    Expr* expr;
+}AssignStmnt;
+
 typedef enum {
-    EXPR_STMNT
+    EXPR_STMNT,
+    PRINT_STMNT,
+    BLOCK_STMNT,
+    DECL_STMNT,
+    ASSIGN_STMNT,
 }StmntTag;
 
 typedef struct {
     StmntTag tag;
     union {
         ExprStmnt exp;
+        PrintStmnt pri;
+        BlockStmnt blo;
+        DeclStmnt dec;
+        AssignStmnt ass;
     }as;
 }Stmnt;
 
-typedef struct {
+typedef struct StmntArr{
     unsigned int count;
     unsigned int capacity;
     Stmnt* stmnts;

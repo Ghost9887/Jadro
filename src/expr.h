@@ -24,7 +24,7 @@ typedef struct {
 typedef enum {
     BINARY_EXPR,
     UNARY_EXPR,
-    VALUE_EXPR
+    VALUE_EXPR,
 }ExprTag;
 
 typedef struct Expr{

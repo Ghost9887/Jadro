@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include "jadro.h"
 #include <stddef.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -165,6 +166,10 @@ static void make_char(Lexer* lexer) {
         count++;
         advance(lexer);
     }
+    if (is_at_end(lexer)) {
+        jadro_error(&lexer->token_arr->tokens[lexer->token_arr->count - 1], "Retazec neni uzatvoreny");
+        return;
+    }
 
     if (count == 1) {
         Value new_value = { .tag = CHAR_VALUE, .as = { .c = lexer->input[lexer->start] } };
@@ -180,12 +185,17 @@ static void make_string(Lexer* lexer) {
     lexer->start = lexer->current;
 
     while (!is_at_end(lexer) && peek(lexer) != '"') advance(lexer);
+    if (is_at_end(lexer)) {
+        jadro_error(&lexer->token_arr->tokens[lexer->token_arr->count - 1], "Retazec neni uzatvoreny");
+        return;
+    }
 
     Value new_value = (Value) {
         .tag = STRING_VALUE,
         .as = { .s = (String) { .len = (lexer->current - lexer->start), .ptr = &lexer->input[lexer->start] } }
     };
-
+    
+    
     
     make_token_value(TOKEN_STRING, new_value, lexer);
     advance(lexer);
