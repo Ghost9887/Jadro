@@ -21,10 +21,15 @@ typedef struct {
     Value value;
 }ValueExpr;
 
+typedef struct {
+    String name;
+}VariableExpr;
+
 typedef enum {
     BINARY_EXPR,
     UNARY_EXPR,
     VALUE_EXPR,
+    VARIABLE_EXPR
 }ExprTag;
 
 typedef struct Expr{
@@ -33,6 +38,7 @@ typedef struct Expr{
         BinaryExpr bin;
         UnaryExpr una;
         ValueExpr val;
+        VariableExpr var;
     }as;
 }Expr;
 

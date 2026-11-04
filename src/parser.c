@@ -226,6 +226,14 @@ static Expr* primary(Parser* parser) {
         };
         return expr;
     }
+    if (match(parser, 1, TOKEN_IDENTIFIER)) {
+        String name = previous(parser)->lexeme;
+        *expr = (Expr) {
+            .tag = VARIABLE_EXPR,
+            .as = { .var = (VariableExpr) { .name = name } }
+        };
+        return expr;
+    }
 
     parse_error(parser, "Ocakavana podmienka");
     return NULL;
