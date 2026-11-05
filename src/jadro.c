@@ -1,16 +1,17 @@
 #include "jadro.h"
 #include "lexer.h"
 #include "parser.h"
+#include "compiler.h"
 #include <stdlib.h>
 #include <stdio.h>
 
 #define DEBUG
 //#define TESTS
 
-char* CONTENT_PTR = NULL;
+const char* CONTENT_PTR = NULL;
 bool HAD_ERROR = false;
 
-void run(char* input) {
+void run(const char* input, const char* output_file_name) {
 #ifndef TESTS
     CONTENT_PTR = input;
     TokenArr tokens;
@@ -43,6 +44,9 @@ void run(char* input) {
     }
 #endif
 
+    Compiler compiler;
+    initialize_compiler(&compiler, &stmnts, output_file_name);
+    compile(&compiler);
 cleanup:
     //free_token_arr(&tokens);
     //free_stmnt_arr(&stmnts);

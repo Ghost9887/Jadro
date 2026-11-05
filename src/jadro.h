@@ -3,7 +3,7 @@
 
 #include "token.h"
 
-void run(char* input);
+void run(const char* input, const char* output_file_name);
 void jadro_error(Token* token, const char* message);
 
 #endif

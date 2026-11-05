@@ -8,7 +8,7 @@ void print_help();
 char* read_file(const char* file_path);
 
 int main(int argc, const char** argv) {
-    if (argc != 2) {
+    if (argc != 2 && argc != 3) {
         print_help();
         return 1;
     }
@@ -16,7 +16,7 @@ int main(int argc, const char** argv) {
     char* input = read_file(argv[1]);
     if (input == NULL) return 1;
 
-    run(input);
+    run(input, argc == 3 ? argv[2] : NULL);
     free(input);
 
     return 0;
@@ -53,5 +53,5 @@ char* read_file(const char* file_path) {
 }
 
 void print_help() {
-    printf("Pouzitie: jdc <subor>\n");
+    printf("Pouzitie: jdc <cesta_k_suboru> [nazov_vystupneho_suboru]\n");
 }
