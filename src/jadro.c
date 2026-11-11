@@ -97,7 +97,7 @@ void print_line(Token* token) {
 
 void jadro_error(Token* token, const char* message) {
     HAD_ERROR = true;
-    printf("\n[SYNTAX CHYBA]: %s\n", message); 
+    printf("\n[CHYBA]: %s\n", message); 
     printf("riadok: %u, stlpec: %u\n", 
         token->line, 
         token->col + token->lexeme.len - 1
