@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "vm.h"
 
 void print_help();
 char* read_file(const char* file_path);
@@ -8,12 +9,10 @@ int main(int argc, char** argv) {
 
     if (argc != 2) 
         print_help();
-
-    char* content = read_file(argv[1]);
-
-    printf("%s", content);
-
-    free(content);
+    VM vm;
+    vm.content = read_file(argv[1]);
+    if (vm.content == NULL) return 1;
+    run(&vm);
 
     return 0;
 }
