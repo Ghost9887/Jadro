@@ -6,14 +6,16 @@ void print_help();
 char* read_file(const char* file_path);
 
 int main(int argc, char** argv) {
-
     if (argc != 2) 
         print_help();
     VM vm;
-    vm.content = read_file(argv[1]);
-    if (vm.content == NULL) return 1;
+    char* content = read_file(argv[1]);
+    if (content == NULL) return 1;
+    
+    initialize_vm(&vm, content);
     run(&vm);
 
+    free(content);
     return 0;
 }
 

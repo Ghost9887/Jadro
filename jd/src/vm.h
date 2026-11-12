@@ -30,8 +30,10 @@ typedef enum {
 
 typedef struct {
     const char* content;
+    unsigned int ip;
 }VM;
 
+void initialize_vm(VM* vm, const char* content);
 void run(VM* vm);
 
 #endif
