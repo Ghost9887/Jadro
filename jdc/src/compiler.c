@@ -4,7 +4,7 @@
 
 void initialize_compiler(Compiler* compiler, StmntArr* stmnt_arr, const char* output_file_name) {
     compiler->stmnt_arr = stmnt_arr;
-    compiler->output_file = fopen((output_file_name == NULL) ? "output.skc" : output_file_name, "w");
+    compiler->output_file = fopen((output_file_name == NULL) ? "output.jdc" : output_file_name, "w");
 }
 
 static void write_code(Compiler* compiler, OpCode code);

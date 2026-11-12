@@ -27,5 +27,6 @@ void print_expr(Expr* expr) {
             break;
         case VARIABLE_EXPR:
             printf("VariableExpr[%.*s]", expr->as.var.name.len, expr->as.var.name.ptr);
+            break;
     }
 }
