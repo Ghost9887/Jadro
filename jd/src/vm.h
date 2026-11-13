@@ -1,6 +1,8 @@
 #ifndef VM_H
 #define VM_H
 
+#include "vmstack.h"
+
 typedef enum {
     OP_NEGATE,
     OP_INTEGER,
@@ -30,7 +32,9 @@ typedef enum {
 
 typedef struct {
     const char* content;
+    unsigned int content_len;
     unsigned int ip;
+    VMStack stack;
 }VM;
 
 void initialize_vm(VM* vm, const char* content);
