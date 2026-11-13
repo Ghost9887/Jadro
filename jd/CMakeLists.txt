@@ -10,6 +10,7 @@ set(SOURCES
     src/vm.c
     src/vmstack.c
     src/value.c
+    src/debugger.c
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

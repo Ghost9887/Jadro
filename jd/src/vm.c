@@ -1,5 +1,6 @@
 #include "vm.h"
 #include "value.h"
+#include "opcode.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>

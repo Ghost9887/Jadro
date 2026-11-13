@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vm.h"
+#include "debugger.h"
 
 void print_help();
 char* read_file(const char* file_path);
@@ -13,6 +14,7 @@ int main(int argc, char** argv) {
     if (bytes == NULL) return 1;
     
     initialize_vm(&vm, bytes);
+    debug(&vm);
     run(&vm);
 
     free(bytes);

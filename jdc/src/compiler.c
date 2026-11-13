@@ -23,6 +23,7 @@ void compile(Compiler* compiler) {
     for (unsigned int i = 0; i < compiler->stmnt_arr->count; i++) {
         evaluate(compiler, &compiler->stmnt_arr->stmnts[i]);
     }
+    write_code(compiler, OP_END);
     fclose(compiler->output_file);
 }
 
