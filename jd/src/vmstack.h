@@ -11,7 +11,7 @@ typedef struct {
 }VMStack;
 
 bool initialize_stack(VMStack* stack);
-void add(VMStack* stack, Value* value);
+void push(VMStack* stack, Value* value);
 Value* pop(VMStack* stack);
 Value* peek(VMStack* stack);
 bool is_empty(VMStack* stack);

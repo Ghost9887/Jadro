@@ -31,8 +31,8 @@ typedef enum {
 }OpCode;
 
 typedef struct {
-    const char* content;
-    unsigned int content_len;
+    const char* bytes;
+    unsigned int bytes_len;
     unsigned int ip;
     VMStack stack;
 }VM;

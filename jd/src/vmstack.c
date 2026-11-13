@@ -30,8 +30,8 @@ bool reallocate_stack(VMStack* stack) {
     return true;
 }
 
-void add(VMStack* stack, Value* value) {
-    reallocate_stack(stack);
+void push(VMStack* stack, Value* value) {
+    if (!reallocate_stack(stack)) exit(1);
     stack->values[stack->count++] = value;
 }
 

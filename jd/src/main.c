@@ -9,13 +9,13 @@ int main(int argc, char** argv) {
     if (argc != 2) 
         print_help();
     VM vm;
-    char* content = read_file(argv[1]);
-    if (content == NULL) return 1;
+    char* bytes = read_file(argv[1]);
+    if (bytes == NULL) return 1;
     
-    initialize_vm(&vm, content);
+    initialize_vm(&vm, bytes);
     run(&vm);
 
-    free(content);
+    free(bytes);
     return 0;
 }
 
