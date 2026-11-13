@@ -16,7 +16,7 @@ int print_double_instruction(VM* vm, int offset) {
     double value;
     memcpy(&value, vm->bytes + offset, sizeof(double));
     printf("OP_DOUBLE | %f\n", value);
-    offset += sizeof(int);
+    offset += sizeof(double);
     return offset;
 }
 
@@ -24,7 +24,7 @@ int print_string_instruction(VM* vm, int offset) {
     int len;
     memcpy(&len, vm->bytes + (++offset), sizeof(int));
     offset++;
-    printf("OP_STRING | %*.s\n", len, vm->bytes + offset);
+    printf("OP_STRING | %d\n", len);
     offset += sizeof(int) + 1 + len;
     return offset;
 }
@@ -82,8 +82,8 @@ int print_instruction(VM* vm, int offset) {
         case OP_NEW_ENV: return print_simple_instruction("OP_NEW_ENV", offset);
         case OP_DELETE_ENV: return print_simple_instruction("OP_DELETE_ENV", offset);
         case OP_END: return print_end_instruction();
-        default: printf("UKNOWN CODE\n"); return ++offset;
     }
+    printf("UKNOWN CODE\n"); return ++offset;
 }
 
 void debug(VM* vm) {

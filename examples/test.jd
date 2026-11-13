@@ -1,1 +1,6 @@
 vytlac(5);
+vytlac(10.1);
+vytlac("Hello, World!");
+vytlac(nic);
+vytlac(pravda);
+vytlac(nepravda);
