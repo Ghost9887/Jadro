@@ -23,9 +23,14 @@ int print_double_instruction(VM* vm, int offset) {
 int print_string_instruction(VM* vm, int offset) {
     int len;
     memcpy(&len, vm->bytes + (++offset), sizeof(int));
-    offset++;
-    printf("OP_STRING | %d\n", len);
-    offset += sizeof(int) + 1 + len;
+    offset += sizeof(int);
+    char* str = (char*)malloc(sizeof(char) * (len + 1));
+    memcpy(str, vm->bytes + offset, len);
+    str[len] = '\0';
+    printf("OP_STRING | %s\n", str);
+    printf("OP_INTEGER | %d\n", len);
+    offset += len;
+    free(str);
     return offset;
 }
 

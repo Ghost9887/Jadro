@@ -1,9 +1,5 @@
-vytlac(5);
-vytlac(10.1);
-vytlac("Hello, World!");
-vytlac(nic);
-vytlac(pravda);
-vytlac(nepravda);
-
+vytlac("Hello" + " World");
+vytlac("This" + " Is" + " A" + " Test");
 vytlac(5 + 5);
-vytlac(10.5 + 1.5);
+vytlac("Hello, World!");
+vytlac(pravda);

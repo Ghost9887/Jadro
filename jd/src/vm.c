@@ -83,7 +83,7 @@ static void push_int(VM* vm) {
     int value;
     memcpy(&value, vm->bytes + vm->ip, sizeof(int));
     vm->ip += sizeof(int);
-    Value* new_val = malloc(sizeof(Value));
+    Value* new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = INTEGER_VALUE, .as = { .i = value } };
     push(&vm->stack, new_val);
 }
@@ -92,7 +92,7 @@ static void push_double(VM* vm) {
     double value;
     memcpy(&value, vm->bytes + vm->ip, sizeof(double));
     vm->ip += sizeof(double);
-    Value* new_val = malloc(sizeof(Value));
+    Value* new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = DOUBLE_VALUE, .as = { .d = value } };
     push(&vm->stack, new_val);
 }
@@ -101,7 +101,7 @@ static void push_string(VM* vm) {
     vm->ip++;
     push_int(vm);
     Value* len = pop(&vm->stack);
-    Value* new_val = malloc(sizeof(Value));
+    Value* new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = STRING_VALUE, .as = 
         { .s = (String) { .len = len->as.i, .ptr = &vm->bytes[vm->ip] } } 
     };
@@ -114,7 +114,7 @@ static void push_char(VM* vm) {
     char c;
     memcpy(&c, vm->bytes + vm->ip, sizeof(char));
     vm->ip += sizeof(char);
-    Value* new_val = malloc(sizeof(Value));
+    Value* new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = CHAR_VALUE, .as = { .c = c } }; 
     push(&vm->stack, new_val);
 }
@@ -123,14 +123,14 @@ static void push_bool(VM* vm) {
     bool b;
     memcpy(&b, vm->bytes + vm->ip, sizeof(bool));
     vm->ip += sizeof(bool);
-    Value*  new_val = malloc(sizeof(Value));
+    Value*  new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = b } };
     push(&vm->stack, new_val);
 }
 
 static void push_nil(VM* vm) {
     vm->ip += 1;
-    Value* new_val = malloc(sizeof(Value));
+    Value* new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = NIL_VALUE, .as = { .n = NULL } };
     push(&vm->stack, new_val);
 }
@@ -138,19 +138,27 @@ static void push_nil(VM* vm) {
 static void binary_op(VM* vm, OpCode code) {
     Value* b = pop(&vm->stack);
     Value* a = pop(&vm->stack);
-    Value* res = malloc(sizeof(Value));
+    Value* res = (Value*)malloc(sizeof(Value));
 
     switch (code) {
         case OP_ADD: {
-            if (is_int(b) && is_int(a)) {
+            if (is_int(a) && is_int(b)) {
                 int num = (a->as.i + b->as.i);
                 *res = (Value) { .tag = INTEGER_VALUE, .as = { .i = num } };
                 push(&vm->stack, res);
-            }else if (is_double(b) && is_double(b)) {
+            }else if (is_double(a) && is_double(b)) {
                 double num = (a->as.d + b->as.d);
                 *res = (Value) { .tag = DOUBLE_VALUE, .as = { .d = num } };
                 push(&vm->stack, res);
-            }            
+            }else if (is_string(a) && is_string(b)) {
+                char* new_str = (char*)malloc(sizeof(char) * (a->as.s.len + b->as.s.len));
+                memcpy(new_str, a->as.s.ptr, a->as.s.len);
+                memcpy(new_str + a->as.s.len, b->as.s.ptr, b->as.s.len);
+                *res = (Value) { .tag = STRING_VALUE, .as = { 
+                    .s = (String) { .len = (a->as.s.len + b->as.s.len), .ptr = new_str } } 
+                };
+                push(&vm->stack, res);
+            }
             //TODO: ERROR
         };break;
         case OP_SUBTRACT:
