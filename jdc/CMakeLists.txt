@@ -15,6 +15,7 @@ set(SOURCES
     src/expr.c
     src/parser.c
     src/stack.c
+    src/hashmap.c
     src/semantic_checker.c
     src/compiler.c
 )
