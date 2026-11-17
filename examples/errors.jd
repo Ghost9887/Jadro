@@ -1,0 +1,9 @@
+vytlac(5 + 'x');
+vytlac("hello" + 10);
+vytlac(4.5 % 2);
+vytlac(1 / 0);
+vytlac("hello" > "world");
+vytlac(5 < 'x');
+vytlac(nic == 3);
+-"Hello";
+!3;

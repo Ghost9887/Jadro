@@ -10,6 +10,7 @@ void initialize_compiler(Compiler* compiler, StmntArr* stmnt_arr, const char* ou
 
 static void write_code(Compiler* compiler, OpCode code);
 static void evaluate(Compiler* compiler, Stmnt* stmnt);
+static void execute(Compiler* compiler, Expr* expr);
 static void expr_statement(Compiler* compiler, ExprStmnt* stmnt);
 static void print_statement(Compiler* compiler, PrintStmnt* stmnt);
 static void block_statement(Compiler* compiler, BlockStmnt* stmnt);

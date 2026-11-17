@@ -14,6 +14,7 @@ set(SOURCES
     src/stmnt.c
     src/expr.c
     src/parser.c
+    src/stack.c
     src/semantic_checker.c
     src/compiler.c
 )

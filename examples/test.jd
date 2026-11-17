@@ -1,5 +1,4 @@
 vytlac("Hello" + " World");
-vytlac("This" + " Is" + " A" + " Test");
 vytlac(5 + 5);
 vytlac("Hello, World!");
 vytlac(pravda);

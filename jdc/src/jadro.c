@@ -100,15 +100,12 @@ void print_line(Token* token) {
     printf("%s\n", pointy);
 }
 
-void syntax_error(Token* token, const char* message) {
+void error(Token* token, const char* message) {
     HAD_ERROR = true;
-    printf("\n[SYNTAX CHYBA]: %s\n", message); 
+    printf("\n[CHYBA]: %s\n", message); 
     printf("riadok: %u, stlpec: %u\n", 
         token->line, 
         token->col + token->lexeme.len - 1
     );
     print_line(token);
-}
-
-void compile_error() {
 }

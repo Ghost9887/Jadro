@@ -8,7 +8,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(SOURCES
     src/main.c
     src/vm.c
-    src/vmstack.c
+    src/stack.c
     src/value.c
     src/debugger.c
 )
