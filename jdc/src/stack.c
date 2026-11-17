@@ -43,7 +43,7 @@ Value* pop(Stack* stack) {
 }
 
 Value* peek(Stack* stack) {
-    return (stack->count > 0) ? stack->values[stack->count] : NULL;
+    return (stack->count > 0) ? stack->values[stack->count - 1] : NULL;
 }
 
 bool is_empty(Stack* stack) {
