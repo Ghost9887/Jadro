@@ -1,6 +1,7 @@
 #include "jadro.h"
 #include "lexer.h"
 #include "parser.h"
+#include "semantic_checker.h"
 #include "compiler.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,6 +37,7 @@ void run(const char* input, const char* output_file_name) {
     initialize_parser(&parser, &stmnts, lexer.token_arr);
     parse(&parser);
     if (HAD_ERROR) goto cleanup;
+
 #ifdef DEBUG
     printf("\n---AST---\n");
     for (int i = 0; i < (int)stmnts.count; i++) {
@@ -43,6 +45,9 @@ void run(const char* input, const char* output_file_name) {
         printf("\n");
     }
 #endif
+
+    semantic_check(&stmnts);
+    if (HAD_ERROR) goto cleanup;
 
     Compiler compiler;
     initialize_compiler(&compiler, &stmnts, output_file_name);
@@ -95,12 +100,15 @@ void print_line(Token* token) {
     printf("%s\n", pointy);
 }
 
-void jadro_error(Token* token, const char* message) {
+void syntax_error(Token* token, const char* message) {
     HAD_ERROR = true;
-    printf("\n[CHYBA]: %s\n", message); 
+    printf("\n[SYNTAX CHYBA]: %s\n", message); 
     printf("riadok: %u, stlpec: %u\n", 
         token->line, 
         token->col + token->lexeme.len - 1
     );
     print_line(token);
+}
+
+void compile_error() {
 }

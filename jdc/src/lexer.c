@@ -167,7 +167,8 @@ static void make_char(Lexer* lexer) {
         advance(lexer);
     }
     if (is_at_end(lexer)) {
-        jadro_error(&lexer->token_arr->tokens[lexer->token_arr->count - 1], "Retazec neni uzatvoreny");
+        syntax_error(&lexer->token_arr->tokens[lexer->token_arr->count - 1], 
+            "Retazec neni uzatvoreny");
         return;
     }
 
@@ -186,7 +187,8 @@ static void make_string(Lexer* lexer) {
 
     while (!is_at_end(lexer) && peek(lexer) != '"') advance(lexer);
     if (is_at_end(lexer)) {
-        jadro_error(&lexer->token_arr->tokens[lexer->token_arr->count - 1], "Retazec neni uzatvoreny");
+        syntax_error(&lexer->token_arr->tokens[lexer->token_arr->count - 1], 
+                "Retazec neni uzatvoreny");
         return;
     }
 

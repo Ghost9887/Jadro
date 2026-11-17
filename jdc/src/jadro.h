@@ -4,6 +4,7 @@
 #include "token.h"
 
 void run(const char* input, const char* output_file_name);
-void jadro_error(Token* token, const char* message);
+void syntax_error(Token* token, const char* message);
+void compile_error();
 
 #endif

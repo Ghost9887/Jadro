@@ -282,7 +282,7 @@ static bool consume(Parser* parser, TokenType type, const char* message) {
 }
 
 static void parse_error(Parser* parser, const char* message) {
-    jadro_error(previous(parser), message);
+    syntax_error(previous(parser), message);
     synchronize(parser);
 }
 
