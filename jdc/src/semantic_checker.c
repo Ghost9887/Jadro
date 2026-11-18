@@ -1,74 +1,75 @@
 #include "semantic_checker.h"
 #include "jadro.h"
-#include "stack.h"
 #include "stmnt.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
-static void evaluate(Stack* stack, Stmnt* stmnt);
-static void execute(Stack* stack, Expr* expr);
-static void expr_statement(Stack* stack, ExprStmnt* stmnt);
-static void print_statement(Stack* stack, PrintStmnt* stmnt);
-static void block_statement(Stack* stack, BlockStmnt* stmnt);
-static void decl_statement(Stack* stack, DeclStmnt* stmnt);
-static void assign_statement(Stack* stack, AssignStmnt* stmnt);
-static void binary_expression(Stack* stack, BinaryExpr* expr);
-static void unary_expression(Stack* stack, UnaryExpr* expr);
-static void value_expression(Stack* stack, ValueExpr* expr);
-static void var_expression(Stack* stack, VariableExpr* expr);
+static void evaluate(SemanticChecker* checker, Stmnt* stmnt);
+static void execute(SemanticChecker* checker, Expr* expr);
+static void expr_statement(SemanticChecker* checker, ExprStmnt* stmnt);
+static void print_statement(SemanticChecker* checker, PrintStmnt* stmnt);
+static void block_statement(SemanticChecker* checker, BlockStmnt* stmnt);
+static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt);
+static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt);
+static void binary_expression(SemanticChecker* checker, BinaryExpr* expr);
+static void unary_expression(SemanticChecker* checker, UnaryExpr* expr);
+static void value_expression(SemanticChecker* checker, ValueExpr* expr);
+static void var_expression(SemanticChecker* checker, VariableExpr* expr);
 static bool is_same_type(ValueTag a, ValueTag b);
 
-void semantic_check(StmntArr* stmnts) {
-    Stack stack;         
-    if(!initialize_stack(&stack)) exit(1);
+bool initialize_semantic_checker(SemanticChecker* checker) {
+    return initialize_stack(&checker->stack);
+}
 
+void semantic_check(SemanticChecker* checker, StmntArr* stmnts) {
     for (unsigned int i = 0; i < stmnts->count; i++) {
-        evaluate(&stack, &stmnts->stmnts[i]);
+        evaluate(checker, &stmnts->stmnts[i]);
     }
 }
 
-static void evaluate(Stack* stack, Stmnt* stmnt) {
+static void evaluate(SemanticChecker* checker, Stmnt* stmnt) {
     switch (stmnt->tag) {
-        case EXPR_STMNT: expr_statement(stack, &stmnt->as.exp); break;
-        case PRINT_STMNT: print_statement(stack, &stmnt->as.pri); break; 
-        case BLOCK_STMNT: block_statement(stack, &stmnt->as.blo); break;
-        case DECL_STMNT: decl_statement(stack, &stmnt->as.dec); break;
-        case ASSIGN_STMNT: assign_statement(stack, &stmnt->as.ass); break;
+        case EXPR_STMNT: expr_statement(checker, &stmnt->as.exp); break;
+        case PRINT_STMNT: print_statement(checker, &stmnt->as.pri); break; 
+        case BLOCK_STMNT: block_statement(checker, &stmnt->as.blo); break;
+        case DECL_STMNT: decl_statement(checker, &stmnt->as.dec); break;
+        case ASSIGN_STMNT: assign_statement(checker, &stmnt->as.ass); break;
     }
 }
 
-static void execute(Stack* stack, Expr* expr) {
+static void execute(SemanticChecker* checker, Expr* expr) {
     switch (expr->tag) {
-        case BINARY_EXPR: binary_expression(stack, &expr->as.bin); break;
-        case UNARY_EXPR: unary_expression(stack, &expr->as.una); break;
-        case VALUE_EXPR: value_expression(stack, &expr->as.val); break;
-        case VARIABLE_EXPR: var_expression(stack, &expr->as.var); break;
+        case BINARY_EXPR: binary_expression(checker, &expr->as.bin); break;
+        case UNARY_EXPR: unary_expression(checker, &expr->as.una); break;
+        case VALUE_EXPR: value_expression(checker, &expr->as.val); break;
+        case VARIABLE_EXPR: var_expression(checker, &expr->as.var); break;
     }
 }
 
-static void expr_statement(Stack* stack, ExprStmnt* stmnt) {
-    execute(stack, stmnt->expr);
+static void expr_statement(SemanticChecker* checker, ExprStmnt* stmnt) {
+    execute(checker, stmnt->expr);
 }
 
-static void print_statement(Stack* stack, PrintStmnt* stmnt) {
-    execute(stack, stmnt->expr);
+static void print_statement(SemanticChecker* checker, PrintStmnt* stmnt) {
+    execute(checker, stmnt->expr);
 }
 
-static void block_statement(Stack* stack, BlockStmnt* stmnt) {
+static void block_statement(SemanticChecker* checker, BlockStmnt* stmnt) {
     for (unsigned int i = 0; i < stmnt->stmnts->count; i++) {
-        evaluate(stack, &stmnt->stmnts->stmnts[i]);
+        evaluate(checker, &stmnt->stmnts->stmnts[i]);
     }
 }
 
-static void decl_statement(Stack* stack, DeclStmnt* stmnt) {}
+static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt) {}
 
-static void assign_statement(Stack* stack, AssignStmnt* stmnt) {}
+static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt) {}
 
-static void binary_expression(Stack* stack, BinaryExpr* expr) {
-    execute(stack, expr->left);
-    execute(stack, expr->right);
+static void binary_expression(SemanticChecker* checker, BinaryExpr* expr) {
+    execute(checker, expr->left);
+    execute(checker, expr->right);
 
+    Stack* stack = &checker->stack;
     ValueTag b = pop(stack);
     ValueTag a = pop(stack);
 
@@ -132,8 +133,10 @@ static void binary_expression(Stack* stack, BinaryExpr* expr) {
     
 }
 
-static void unary_expression(Stack* stack, UnaryExpr* expr) {
-    execute(stack, expr->right);
+static void unary_expression(SemanticChecker* checker, UnaryExpr* expr) {
+    execute(checker, expr->right);
+
+    Stack* stack = &checker->stack;
     ValueTag a = pop(stack);
 
     switch (expr->op->type) {
@@ -152,11 +155,11 @@ static void unary_expression(Stack* stack, UnaryExpr* expr) {
     }
 }
 
-static void value_expression(Stack* stack, ValueExpr* expr) {
-    push(stack, expr->value.tag);
+static void value_expression(SemanticChecker* checker, ValueExpr* expr) {
+    push(&checker->stack, expr->value.tag);
 }
 
-static void var_expression(Stack* stack, VariableExpr* expr) {
+static void var_expression(SemanticChecker* checker, VariableExpr* expr) {
 }
 
 static bool is_same_type(ValueTag a, ValueTag b) {

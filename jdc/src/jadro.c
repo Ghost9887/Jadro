@@ -21,7 +21,7 @@ void run(const char* input, const char* output_file_name) {
     Lexer lexer;
     initialize_lexer(&lexer, &tokens, CONTENT_PTR);
     tokenize(&lexer);
-    if (HAD_ERROR) goto cleanup;
+    if (HAD_ERROR) return;
 
 #ifdef DEBUG
     printf("\n---TOKENS---\n");
@@ -36,7 +36,7 @@ void run(const char* input, const char* output_file_name) {
     Parser parser;
     initialize_parser(&parser, &stmnts, lexer.token_arr);
     parse(&parser);
-    if (HAD_ERROR) goto cleanup;
+    if (HAD_ERROR) return;
 
 #ifdef DEBUG
     printf("\n---AST---\n");
@@ -46,15 +46,14 @@ void run(const char* input, const char* output_file_name) {
     }
 #endif
 
-    semantic_check(&stmnts);
-    if (HAD_ERROR) goto cleanup;
+    SemanticChecker checker;
+    if (!initialize_semantic_checker(&checker)) return;
+    semantic_check(&checker, &stmnts);
+    if (HAD_ERROR) return;
 
     Compiler compiler;
     initialize_compiler(&compiler, &stmnts, output_file_name);
     compile(&compiler);
-cleanup:
-    //free_token_arr(&tokens);
-    //free_stmnt_arr(&stmnts);
 #endif
 
 #ifdef TESTS
