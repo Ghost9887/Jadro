@@ -195,8 +195,8 @@ static bool is_same_type(ValueTag a, ValueTag b) {
 }
 
 static void create_new_env(SemanticChecker* checker) {
-    if (checker->current_env + 1 > MAX_ENVS) {
-        printf("Maximalny pocet blokov dosiahnuty! (MAX: %u)\n", MAX_ENVS);
+    if (checker->current_env + 1 >= MAX_ENVS) {
+        printf("Maximalny pocet blokov presiahnuty! (MAX: %u)\n", MAX_ENVS - 1);
         exit(1);
     }else {
         new_env(&checker->env_arr[++checker->current_env], &checker->env_arr[checker->current_env - 1]);
@@ -205,7 +205,7 @@ static void create_new_env(SemanticChecker* checker) {
 
 static void destroy_current_env(SemanticChecker* checker) {
     if (checker->current_env <= 0) {
-        printf("Current env je mensi ako 0!\n");
+        printf("Current env je mensi alebo rovni 0!\n");
         exit(1);
     }else {
         destroy_env(&checker->env_arr[checker->current_env--]);

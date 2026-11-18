@@ -5,5 +5,7 @@ vytlac(a);
     vytlac(a);
     a = 20;
     vytlac(a);
+    {
+    }
 }
 vytlac(a);
