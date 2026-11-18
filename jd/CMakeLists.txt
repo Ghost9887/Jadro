@@ -10,6 +10,8 @@ set(SOURCES
     src/vm.c
     src/stack.c
     src/value.c
+    src/variable.c
+    src/environment.c
     src/debugger.c
 )
 

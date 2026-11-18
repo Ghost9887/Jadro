@@ -9,7 +9,9 @@
 void initialize_vm(VM* vm, const char* bytes) {
     vm->ip = 0;
     vm->bytes = bytes;
-    if (!initialize_stack(&vm->stack)) exit(1);
+    initialize_stack(&vm->stack);
+    vm->current_env = 0;
+    new_env(&vm->env_arr[vm->current_env], NULL);
 }
 
 static OpCode get_code(VM* vm);
@@ -26,6 +28,11 @@ static void push_char(VM* vm);
 static void push_bool(VM* vm);
 static void push_nil(VM* vm);
 static void binary_op(VM* vm, OpCode code);
+static void create_new_env(VM* vm);
+static void destroy_current_env(VM* vm);
+static void declare_var(VM* vm);
+static void assign_var(VM* vm);
+static void var(VM* vm);
 
 void run(VM* vm) {
     bool running = true;
@@ -46,6 +53,11 @@ void run(VM* vm) {
                 binary_op(vm, code); 
                 break; 
             case OP_PRINT: print_value(pop(&vm->stack)); break;
+            case OP_DECL: declare_var(vm); break;
+            case OP_ASSIGN: assign_var(vm); break;
+            case OP_VAR: var(vm); break;
+            case OP_NEW_ENV: create_new_env(vm); break;
+            case OP_DELETE_ENV: destroy_current_env(vm); break;
             case OP_END: running = false; break;
             default: printf("Uknown code\n"); break;
         }
@@ -172,4 +184,30 @@ static void binary_op(VM* vm, OpCode code) {
         case OP_NOT_EQUALS:
         default: break; //unreachable
     }
+}
+
+static void declare_var(VM* vm) {
+    Value* name = pop(&vm->stack);
+    Value* val = pop(&vm->stack);
+    add_variable(&vm->env_arr[vm->current_env], &name->as.s, val);
+}
+
+static void assign_var(VM* vm) {
+    Value* name = pop(&vm->stack);
+    Value* val = pop(&vm->stack);
+    Variable* var = get_variable(&vm->env_arr[vm->current_env], &name->as.s);
+    var->value = val;
+}
+
+static void var(VM* vm) {
+    Value* name = pop(&vm->stack);
+    push(&vm->stack, get_variable(&vm->env_arr[vm->current_env], &name->as.s)->value);
+}
+
+static void create_new_env(VM* vm) {
+    new_env(&vm->env_arr[++vm->current_env], &vm->env_arr[vm->current_env - 1]);
+}
+
+static void destroy_current_env(VM* vm) {
+    destroy_env(&vm->env_arr[vm->current_env--]);
 }

@@ -105,11 +105,15 @@ static void block_statement(Compiler* compiler, BlockStmnt* stmnt) {
 
 static void decl_statement(Compiler* compiler, DeclStmnt* stmnt) {
     execute(compiler, stmnt->expr);
+    Value temp = (Value) { .tag = STRING_VALUE, .as = { .s = stmnt->name } };
+    write_value(compiler, &temp);
     write_code(compiler, OP_DECL);
 }
 
 static void assign_statement(Compiler* compiler, AssignStmnt* stmnt) {
     execute(compiler, stmnt->expr);
+    Value temp = (Value) { .tag = STRING_VALUE, .as = { .s = stmnt->name } };
+    write_value(compiler, &temp);
     write_code(compiler, OP_ASSIGN);
 }
 
