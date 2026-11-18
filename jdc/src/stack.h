@@ -9,7 +9,7 @@ typedef struct {
     ValueTag* types;
 }Stack;
 
-bool initialize_stack(Stack* stack);
+void initialize_stack(Stack* stack);
 void push(Stack* stack, ValueTag type);
 ValueTag pop(Stack* stack);
 bool is_empty(Stack* stack);

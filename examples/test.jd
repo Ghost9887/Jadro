@@ -1,5 +1,9 @@
-vytlac("Hello" + " World");
-vytlac("This " + "Is" + " A" + " Test");
-vytlac(5 + 5);
-vytlac("Hello, World!");
-vytlac(pravda);
+prem a = 5;
+vytlac(a);
+{ 
+    prem a = 10;
+    vytlac(a);
+    a = 20;
+    vytlac(a);
+}
+vytlac(a);

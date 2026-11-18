@@ -20,11 +20,13 @@ typedef struct {
 typedef struct {
     String name;
     Expr* expr;
+    Token* token;
 }DeclStmnt;
 
 typedef struct {
     String name;
     Expr* expr;
+    Token* token;
 }AssignStmnt;
 
 typedef enum {
@@ -53,8 +55,8 @@ typedef struct StmntArr{
 }StmntArr;
 
 void print_stmnt(Stmnt* stmnt);
-bool initialize_stmnt_arr(StmntArr* arr);
-bool reallocate_stmnt_arr(StmntArr* arr);
+void initialize_stmnt_arr(StmntArr* arr);
+void reallocate_stmnt_arr(StmntArr* arr);
 void free_stmnt_arr(StmntArr* arr);
 
 #endif

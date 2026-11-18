@@ -79,7 +79,7 @@ static void make_token(TokenType type, Lexer* lexer) {
         .value = (Value) { .tag = NIL_VALUE, .as = { .n = NULL } }
     };
     
-    if (!reallocate_token_arr(lexer->token_arr)) exit(1);
+    reallocate_token_arr(lexer->token_arr);
     lexer->token_arr->tokens[lexer->token_arr->count++] = new_token;
 }
 
@@ -92,7 +92,7 @@ static void make_token_value(TokenType type, Value value, Lexer* lexer) {
         .value = value
     };
     
-    if (!reallocate_token_arr(lexer->token_arr)) exit(1);
+    reallocate_token_arr(lexer->token_arr);
     lexer->token_arr->tokens[lexer->token_arr->count++] = new_token;
 }
 

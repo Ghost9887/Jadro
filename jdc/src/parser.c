@@ -34,7 +34,7 @@ void initialize_parser(Parser* parser, StmntArr* stmnt_arr, TokenArr* token_arr)
 
 void parse(Parser* parser) {
     while (parser->ip < parser->token_arr->count) {
-        if (!reallocate_stmnt_arr(parser->stmnt_arr)) return;
+        reallocate_stmnt_arr(parser->stmnt_arr);
         parser->stmnt_arr->stmnts[parser->stmnt_arr->count++] = statement(parser);
     }
 }
@@ -84,7 +84,7 @@ static Stmnt block_statement(Parser* parser) {
 
 static Stmnt decl_statement(Parser* parser) {
     consume(parser, TOKEN_IDENTIFIER, "Ocakavany identifikator");
-    String name = previous(parser)->lexeme;
+    Token* prev = previous(parser);
     
     bool has_value = false;
     Expr* expr;
@@ -103,19 +103,19 @@ static Stmnt decl_statement(Parser* parser) {
     
     return (Stmnt) {
         .tag = DECL_STMNT,
-        .as = { .dec = (DeclStmnt) { .name = name, .expr = expr } }
+        .as = { .dec = (DeclStmnt) { .name = prev->lexeme, .expr = expr, .token = prev } }
     };
 }
 
 static Stmnt assign_statement(Parser* parser) {
-    String name = previous(parser)->lexeme;
+    Token* prev = previous(parser);
     consume(parser, TOKEN_EQUALS, "Ocakavany '='");
     Expr* expr = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Ocakavany ';'");
 
     return (Stmnt) {
         .tag = ASSIGN_STMNT,
-        .as = { .ass = (AssignStmnt) { .name = name, .expr = expr } }
+        .as = { .ass = (AssignStmnt) { .name = prev->lexeme, .expr = expr, .token = prev } }
     };
 }
 
@@ -227,10 +227,10 @@ static Expr* primary(Parser* parser) {
         return expr;
     }
     if (match(parser, 1, TOKEN_IDENTIFIER)) {
-        String name = previous(parser)->lexeme;
+        Token* prev = previous(parser);
         *expr = (Expr) {
             .tag = VARIABLE_EXPR,
-            .as = { .var = (VariableExpr) { .name = name } }
+            .as = { .var = (VariableExpr) { .name = prev->lexeme, .token = prev } }
         };
         return expr;
     }

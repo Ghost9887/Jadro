@@ -23,6 +23,7 @@ typedef struct {
 
 typedef struct {
     String name;
+    Token* token;
 }VariableExpr;
 
 typedef enum {

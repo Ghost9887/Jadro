@@ -2,30 +2,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-bool initialize_token_arr(TokenArr* arr) {
+void initialize_token_arr(TokenArr* arr) {
     arr->count = 0;
     arr->capacity = 2;
     arr->tokens = (Token*)malloc(sizeof(Token) * arr->capacity);
 
     if (arr->tokens == NULL) {
         printf("Nepodarilo sa vytvorit pole Token\n");
-        return false;
+        exit(1);
     }
-
-    return true;
 }
 
-bool reallocate_token_arr(TokenArr* arr) {
+void reallocate_token_arr(TokenArr* arr) {
     if (arr->count + 1 > arr->capacity) {
         arr->capacity *= 2;
         arr->tokens = (Token*)realloc(arr->tokens, sizeof(Token) * arr->capacity);
 
         if (arr->tokens == NULL) {
             printf("Nepodarilo sa zvacsit pole\n");
-            return false;
+            exit(1);
         }
     }
-    return true;
 }
 
 void free_token_arr(TokenArr* arr) {

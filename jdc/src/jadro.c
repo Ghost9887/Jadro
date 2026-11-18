@@ -16,7 +16,7 @@ void run(const char* input, const char* output_file_name) {
 #ifndef TESTS
     CONTENT_PTR = input;
     TokenArr tokens;
-    if (!initialize_token_arr(&tokens)) return;
+    initialize_token_arr(&tokens);
 
     Lexer lexer;
     initialize_lexer(&lexer, &tokens, CONTENT_PTR);
@@ -31,7 +31,7 @@ void run(const char* input, const char* output_file_name) {
 #endif
 
     StmntArr stmnts;
-    if (!initialize_stmnt_arr(&stmnts)) return;
+    initialize_stmnt_arr(&stmnts);
 
     Parser parser;
     initialize_parser(&parser, &stmnts, lexer.token_arr);
@@ -47,7 +47,7 @@ void run(const char* input, const char* output_file_name) {
 #endif
 
     SemanticChecker checker;
-    if (!initialize_semantic_checker(&checker)) return;
+    initialize_semantic_checker(&checker);
     semantic_check(&checker, &stmnts);
     if (HAD_ERROR) return;
 

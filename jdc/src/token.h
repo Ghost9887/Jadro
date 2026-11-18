@@ -32,8 +32,8 @@ typedef struct {
     Token* tokens;
 }TokenArr;
 
-bool initialize_token_arr(TokenArr* arr);
-bool reallocate_token_arr(TokenArr* arr);
+void initialize_token_arr(TokenArr* arr);
+void reallocate_token_arr(TokenArr* arr);
 void free_token_arr(TokenArr* arr);
 void print_token(const Token* token);
 

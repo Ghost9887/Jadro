@@ -5,19 +5,17 @@
 
 #define INITIAL_CAPACITY 2
 
-bool initialize_stack(Stack* stack) {
+void initialize_stack(Stack* stack) {
     stack->count = 0;
     stack->capacity = INITIAL_CAPACITY;
     stack->types = (ValueTag*)malloc(sizeof(ValueTag) * stack->capacity);
     if (stack->types == NULL) {
         printf("Nepodarilo sa allocovat stack\n");
-        return false;
+        exit(1);
     }
-
-    return true;
 }
 
-bool reallocate_stack(Stack* stack) {
+void reallocate_stack(Stack* stack) {
     if (stack->count + 1 > stack->capacity) {
         stack->capacity *= 2;
         stack->types = 
@@ -25,7 +23,7 @@ bool reallocate_stack(Stack* stack) {
 
         if (stack->types == NULL) {
             printf("Nepodarilo sa reallocovat stack\n");
-            return false;
+            exit(1);
         }
     }else if (stack->capacity > INITIAL_CAPACITY && (stack->count - 1 < stack->capacity / 2)) {
         stack->capacity /= 2;
@@ -36,14 +34,13 @@ bool reallocate_stack(Stack* stack) {
 
         if (stack->types == NULL) {
             printf("Nepodarilo sa reallocovat stack\n");
-            return false;
+            exit(1);
         }
     }
-    return true;
 }
 
 void push(Stack* stack, ValueTag type) {
-    if (!reallocate_stack(stack)) exit(1);
+    reallocate_stack(stack);
     stack->types[stack->count++] = type;
 }
 

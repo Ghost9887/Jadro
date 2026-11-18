@@ -17,9 +17,13 @@ static void unary_expression(SemanticChecker* checker, UnaryExpr* expr);
 static void value_expression(SemanticChecker* checker, ValueExpr* expr);
 static void var_expression(SemanticChecker* checker, VariableExpr* expr);
 static bool is_same_type(ValueTag a, ValueTag b);
+static void create_new_env(SemanticChecker* checker);
+static void destroy_current_env(SemanticChecker* checker);
 
-bool initialize_semantic_checker(SemanticChecker* checker) {
-    return initialize_stack(&checker->stack);
+void initialize_semantic_checker(SemanticChecker* checker) {
+    initialize_stack(&checker->stack);
+    checker->current_env = 0;
+    new_env(&checker->env_arr[checker->current_env], NULL);
 }
 
 void semantic_check(SemanticChecker* checker, StmntArr* stmnts) {
@@ -56,14 +60,32 @@ static void print_statement(SemanticChecker* checker, PrintStmnt* stmnt) {
 }
 
 static void block_statement(SemanticChecker* checker, BlockStmnt* stmnt) {
+    create_new_env(checker);
     for (unsigned int i = 0; i < stmnt->stmnts->count; i++) {
         evaluate(checker, &stmnt->stmnts->stmnts[i]);
     }
+    destroy_current_env(checker);
 }
 
-static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt) {}
+static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt) {
+    execute(checker, stmnt->expr);
+    ValueTag val = pop(&checker->stack);
 
-static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt) {}
+    if (!add_variable(&checker->env_arr[checker->current_env], &stmnt->name, val)) 
+        error(stmnt->token, "Premenna uz existuje");
+}
+
+static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt) {
+    execute(checker, stmnt->expr);   
+    ValueTag val = pop(&checker->stack);
+
+    Variable* var = get_variable(&checker->env_arr[checker->current_env], &stmnt->name);
+    if (var == NULL)
+        error(stmnt->token, "Premenna neexistuje");
+    else {
+        var->value = val;
+    }
+}
 
 static void binary_expression(SemanticChecker* checker, BinaryExpr* expr) {
     execute(checker, expr->left);
@@ -98,7 +120,7 @@ static void binary_expression(SemanticChecker* checker, BinaryExpr* expr) {
         };break;
         case TOKEN_PERCENT: {
             if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, INTEGER_VALUE);
-            else error(expr->op, "Operacia '\%' sa neda pouzit na tomto vzorcy"); 
+            else error(expr->op, "Operacia '%' sa neda pouzit na tomto vzorcy"); 
         };break;
         case TOKEN_EQUALS_EQUALS: {
             if (is_same_type(a, b)) push(stack, BOOLEAN_VALUE);
@@ -160,8 +182,32 @@ static void value_expression(SemanticChecker* checker, ValueExpr* expr) {
 }
 
 static void var_expression(SemanticChecker* checker, VariableExpr* expr) {
+    Variable* var = get_variable(&checker->env_arr[checker->current_env], &expr->name);
+    if (var == NULL) 
+        error(expr->token, "Premenna neexistuje");
+    else {
+        push(&checker->stack, var->value);
+    }
 }
 
 static bool is_same_type(ValueTag a, ValueTag b) {
     return a == b;
 }
+
+static void create_new_env(SemanticChecker* checker) {
+    if (checker->current_env + 1 > MAX_ENVS) {
+        printf("Maximalny pocet blokov dosiahnuty! (MAX: %u)\n", MAX_ENVS);
+        exit(1);
+    }else {
+        new_env(&checker->env_arr[++checker->current_env], &checker->env_arr[checker->current_env - 1]);
+    }
+}
+
+static void destroy_current_env(SemanticChecker* checker) {
+    if (checker->current_env <= 0) {
+        printf("Current env je mensi ako 0!\n");
+        exit(1);
+    }else {
+        destroy_env(&checker->env_arr[checker->current_env--]);
+    }
+}   

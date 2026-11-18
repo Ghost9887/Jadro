@@ -7,3 +7,13 @@ vytlac(5 < 'x');
 vytlac(nic == 3);
 -"Hello";
 !3;
+{
+    prem b = 10;
+    {
+        prem b = 5;
+        b = 20;
+
+    }
+    b = 1;
+}
+b = 20;
