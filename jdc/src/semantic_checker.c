@@ -80,8 +80,9 @@ static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt) {
     ValueTag val = pop(&checker->stack);
 
     Variable* var = get_variable(&checker->env_arr[checker->current_env], &stmnt->name);
-    if (var == NULL)
+    if (var == NULL) {
         error(stmnt->token, "Premenna neexistuje");
+    }
     else {
         var->value = val;
     }
@@ -199,7 +200,9 @@ static void create_new_env(SemanticChecker* checker) {
         printf("Maximalny pocet blokov presiahnuty! (MAX: %u)\n", MAX_ENVS - 1);
         exit(1);
     }else {
-        new_env(&checker->env_arr[++checker->current_env], &checker->env_arr[checker->current_env - 1]);
+        unsigned int new = ++checker->current_env;
+        unsigned int parent = checker->current_env - 1;
+        new_env(&checker->env_arr[new], &checker->env_arr[parent]);
     }
 }
 

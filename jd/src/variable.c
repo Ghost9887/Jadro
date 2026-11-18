@@ -14,9 +14,8 @@ void initialize_var_arr(VariableArr* arr) {
 }
 
 void reallocate_var_arr(VariableArr* arr) {
-    if (arr->count > arr->capacity) {
+    if (arr->count + 1 > arr->capacity) {
         arr->capacity *= 2;
-
         arr->variables = (Variable*)realloc(arr->variables, sizeof(Variable) * arr->capacity);
         if (arr->variables == NULL) {
             printf("Nepodarilo sa reallocovat Variable Arr\n");

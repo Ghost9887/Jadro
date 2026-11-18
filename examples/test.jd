@@ -1,8 +1,11 @@
 prem a = 5;
+prem b;
 vytlac(a);
+vytlac(b);
 { 
-    prem a = 10;
+    b = 1;
     vytlac(a);
+    vytlac(b);
     a = 20;
     vytlac(a);
 }

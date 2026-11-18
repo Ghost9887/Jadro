@@ -1,6 +1,7 @@
 #include "environment.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void new_env(Env* env, Env* parent) {
     *env = (Env) { .parent = parent };
@@ -26,10 +27,10 @@ bool add_variable(Env* env, String* name, ValueTag value) {
 Variable* get_variable(Env* env, String* name) {
     for (unsigned int i = 0; i < env->var_arr.count; i++) {
         String* cur = &env->var_arr.variables[i].name;
-        if (memcmp(cur->ptr, name->ptr, cur->len) == 0) 
+        if (memcmp(cur->ptr, name->ptr, cur->len) == 0) {
             return &env->var_arr.variables[i];
-    }
-    if (env->parent != NULL) {
+        }
+    }if (env->parent != NULL) {
         return get_variable(env->parent, name);
     }
     return NULL;

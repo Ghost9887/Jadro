@@ -141,7 +141,6 @@ static void push_bool(VM* vm) {
 }
 
 static void push_nil(VM* vm) {
-    vm->ip += 1;
     Value* new_val = (Value*)malloc(sizeof(Value));
     *new_val = (Value) { .tag = NIL_VALUE, .as = { .n = NULL } };
     push(&vm->stack, new_val);
@@ -205,7 +204,9 @@ static void var(VM* vm) {
 }
 
 static void create_new_env(VM* vm) {
-    new_env(&vm->env_arr[++vm->current_env], &vm->env_arr[vm->current_env - 1]);
+    unsigned int new = ++vm->current_env;
+    unsigned int parent = vm->current_env - 1;
+    new_env(&vm->env_arr[new], &vm->env_arr[parent]);
 }
 
 static void destroy_current_env(VM* vm) {
