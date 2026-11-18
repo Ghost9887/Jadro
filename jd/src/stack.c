@@ -56,3 +56,4 @@ Value* pop(Stack* stack) {
 bool is_empty(Stack* stack) {
     return stack->count == 0;
 }
+

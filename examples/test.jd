@@ -7,3 +7,8 @@ vytlac(a);
     vytlac(a);
 }
 vytlac(a);
+
+prem i = 10;
+prem y = 5;
+
+vytlac(i + y);
