@@ -8,23 +8,22 @@
 bool initialize_stack(Stack* stack) {
     stack->count = 0;
     stack->capacity = INITIAL_CAPACITY;
-    stack->values = (Value**)malloc(sizeof(Value*) * stack->capacity);
-    if (stack->values == NULL) {
+    stack->types = (ValueTag*)malloc(sizeof(ValueTag) * stack->capacity);
+    if (stack->types == NULL) {
         printf("Nepodarilo sa allocovat stack\n");
         return false;
     }
 
-    stack->top = NULL;
     return true;
 }
 
 bool reallocate_stack(Stack* stack) {
     if (stack->count + 1 > stack->capacity) {
         stack->capacity *= 2;
-        stack->values = 
-            (Value**)realloc(stack->values, sizeof(Value*) * stack->capacity);
+        stack->types = 
+            (ValueTag*)realloc(stack->types, sizeof(ValueTag) * stack->capacity);
 
-        if (stack->values == NULL) {
+        if (stack->types == NULL) {
             printf("Nepodarilo sa reallocovat stack\n");
             return false;
         }
@@ -32,10 +31,10 @@ bool reallocate_stack(Stack* stack) {
         stack->capacity /= 2;
         if (stack->capacity % 2 != 0) stack->capacity++;
 
-        stack->values =
-            (Value**)realloc(stack->values, sizeof(Value*) * stack->capacity);
+        stack->types =
+            (ValueTag*)realloc(stack->types, sizeof(ValueTag) * stack->capacity);
 
-        if (stack->values == NULL) {
+        if (stack->types == NULL) {
             printf("Nepodarilo sa reallocovat stack\n");
             return false;
         }
@@ -43,20 +42,16 @@ bool reallocate_stack(Stack* stack) {
     return true;
 }
 
-void push(Stack* stack, Value* value) {
+void push(Stack* stack, ValueTag type) {
     if (!reallocate_stack(stack)) exit(1);
-    stack->values[stack->count++] = value;
+    stack->types[stack->count++] = type;
 }
 
-Value* pop(Stack* stack) {
+ValueTag pop(Stack* stack) {
     if (!is_empty(stack)) {
-        return stack->values[--stack->count];
+        return stack->types[--stack->count];
     }
-    return NULL;
-}
-
-Value* peek(Stack* stack) {
-    return (stack->count > 0) ? stack->values[stack->count - 1] : NULL;
+    return NIL_VALUE;
 }
 
 bool is_empty(Stack* stack) {

@@ -6,14 +6,12 @@
 typedef struct {
     unsigned int count;
     unsigned int capacity;
-    Value** values;
-    Value* top;
+    ValueTag* types;
 }Stack;
 
 bool initialize_stack(Stack* stack);
-void push(Stack* stack, Value* value);
-Value* pop(Stack* stack);
-Value* peek(Stack* stack);
+void push(Stack* stack, ValueTag type);
+ValueTag pop(Stack* stack);
 bool is_empty(Stack* stack);
 
 #endif

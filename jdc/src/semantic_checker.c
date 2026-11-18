@@ -17,13 +17,7 @@ static void binary_expression(Stack* stack, BinaryExpr* expr);
 static void unary_expression(Stack* stack, UnaryExpr* expr);
 static void value_expression(Stack* stack, ValueExpr* expr);
 static void var_expression(Stack* stack, VariableExpr* expr);
-static bool is_int(Value* value);
-static bool is_double(Value* value);
-static bool is_string(Value* value);
-static bool is_char(Value* value);
-static bool is_bool(Value* value);
-static bool is_nil(Value* value);
-static bool is_same_type(Value* a, Value* b);
+static bool is_same_type(ValueTag a, ValueTag b);
 
 void semantic_check(StmntArr* stmnts) {
     Stack stack;         
@@ -75,118 +69,63 @@ static void binary_expression(Stack* stack, BinaryExpr* expr) {
     execute(stack, expr->left);
     execute(stack, expr->right);
 
-    Value* b = pop(stack);
-    Value* a = pop(stack);
-
-    if (b == NULL || a == NULL) {
-        error(expr->op, "CHYBA KOMPILATORA!");
-        return;
-    }
+    ValueTag b = pop(stack);
+    ValueTag a = pop(stack);
 
     switch (expr->op->type) {
         case TOKEN_PLUS: { 
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_string(a) && !is_string(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_char(a) || is_bool(a) || is_nil(a)) {
-                error(expr->op, "Operacia '+' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, INTEGER_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, DOUBLE_VALUE);
+            else if (a == STRING_VALUE && b == STRING_VALUE) push(stack, STRING_VALUE);
+            else error(expr->op, "Operacia '+' sa neda pouzit na tomto vzorcy");
         };break;
         case TOKEN_MINUS: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_char(a) || is_bool(a) || is_nil(a) || is_string(a)) {
-                error(expr->op, "Operacia '-' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, INTEGER_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, DOUBLE_VALUE);
+            else error(expr->op, "Operacia '-' sa neda pouzit na tomto vzorcy");
         };break;
         case TOKEN_STAR: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_string(a) && !is_int(b)) {
-                error(expr->op, "Typ 'retazec' sa da pouzit iba s typom int");
-            }else if (is_char(a) || is_bool(a) || is_nil(a)) {
-                error(expr->op, "Operacia '*' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, INTEGER_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, DOUBLE_VALUE);
+            else if (a == STRING_VALUE && b == INTEGER_VALUE) push(stack, STRING_VALUE);
+            else error(expr->op, "Operacia '*' sa neda pouzit na tomto vzorcy");
         };break;
         case TOKEN_SLASH: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_char(a) || is_bool(a) || is_nil(a) || is_string(a)) {
-                error(expr->op, "Operacia '/' sa neda pouzit na tomto type");
-            }else {
-                int divider = (is_int(b)) ? b->as.i : b->as.d;
-                if (divider == 0) error(expr->op, "Delenie nulou");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, INTEGER_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, DOUBLE_VALUE);
+            else error(expr->op, "Operacia '/' sa neda pouzit na tomto vzorcy");
         };break;
         case TOKEN_PERCENT: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy niesu ten isty typ");
-            }else if (is_char(a) || is_bool(a) || is_nil(a) || is_string(a) || is_double(a)) {
-                error(expr->op, "Operacia '\%' sa neda pouzit na tomto type");
-            }        
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, INTEGER_VALUE);
+            else error(expr->op, "Operacia '\%' sa neda pouzit na tomto vzorcy"); 
         };break;
         case TOKEN_EQUALS_EQUALS: {
-            if (!is_same_type(a, b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }
+            if (is_same_type(a, b)) push(stack, BOOLEAN_VALUE);
+            else error(expr->op, "Tieto typy sa nedaju porovnat");
         };break;
         case TOKEN_BANG_EQUALS: {
-            if (!is_same_type(a, b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }
+            if (is_same_type(a, b)) push(stack, BOOLEAN_VALUE);
+            else error(expr->op, "Tieto typy sa nedaju porovnat");
         };break;
         case TOKEN_GREATER: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_bool(a) && !is_bool(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_char(a) || is_string(a) || is_nil(a)) {
-                error(expr->op, "Operacia '>' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, BOOLEAN_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, BOOLEAN_VALUE);
+            else error(expr->op, "Tieto typy sa nedaju porovnat");
         };break;
         case TOKEN_GREATER_EQUALS: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_bool(a) && !is_bool(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_char(a) || is_string(a) || is_nil(a)) {
-                error(expr->op, "Operacia '>=' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, BOOLEAN_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, BOOLEAN_VALUE);
+            else error(expr->op, "Tieto typy sa nedaju porovnat");
         };break;
         case TOKEN_LESSER: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_bool(a) && !is_bool(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_char(a) || is_string(a) || is_nil(a)) {
-                error(expr->op, "Operacia '<' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, BOOLEAN_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, BOOLEAN_VALUE);
+            else error(expr->op, "Tieto typy sa nedaju porovnat");
         };break;
         case TOKEN_LESSER_EQUALS: {
-            if (is_int(a) && !is_int(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_double(a) && !is_double(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_bool(a) && !is_bool(b)) {
-                error(expr->op, "Operandy sa nedaju porovnat");
-            }else if (is_char(a) || is_string(a) || is_nil(a)) {
-                error(expr->op, "Operacia '<=' sa neda pouzit na tomto type");
-            }
+            if (a == INTEGER_VALUE && b == INTEGER_VALUE) push(stack, BOOLEAN_VALUE);
+            else if (a == DOUBLE_VALUE && b == DOUBLE_VALUE) push(stack, BOOLEAN_VALUE);
+            else error(expr->op, "Tieto typy sa nedaju porovnat");
         };break;
         default: break; //unreachable
     }
@@ -195,60 +134,31 @@ static void binary_expression(Stack* stack, BinaryExpr* expr) {
 
 static void unary_expression(Stack* stack, UnaryExpr* expr) {
     execute(stack, expr->right);
-    Value* a = pop(stack);
+    ValueTag a = pop(stack);
 
     switch (expr->op->type) {
         case TOKEN_MINUS: {
-            if (is_bool(a)) {
-                error(expr->op, "Tento typ sa neguje pomocou '!'");
-            }
-            else if (is_char(a) || is_string(a) || is_nil(a)) {
-                error(expr->op, "Tento typ sa neda negovat");
-            }
+            if (a == INTEGER_VALUE) push(stack, INTEGER_VALUE);
+            else if (a == DOUBLE_VALUE) push(stack, DOUBLE_VALUE);
+            else if (a == BOOLEAN_VALUE) error(expr->op, "Tento typ sa neguje pomocou '!'");
+            else error(expr->op, "Tento typ sa neda negovat");
         };break;
         case TOKEN_BANG: {
-            if (is_int(a) || is_double(a)) {
-                error(expr->op, "Tento typ sa neguje pomocou '-'");
-            }
-            else if (is_char(a) || is_string(a) || is_nil(a)) {
-                error(expr->op, "Tento typ sa neda negovat");
-            }
+            if (a == BOOLEAN_VALUE) push(stack, BOOLEAN_VALUE);
+            else if (a == INTEGER_VALUE || a == DOUBLE_VALUE) error(expr->op, "Tento typ sa neguje pomocou '-'");
+            else error(expr->op, "Tento typ sa neda negovat");
         };break;
         default: break; //unreachable
     }
 }
 
 static void value_expression(Stack* stack, ValueExpr* expr) {
-    push(stack, &expr->value);
+    push(stack, expr->value.tag);
 }
 
 static void var_expression(Stack* stack, VariableExpr* expr) {
 }
 
-static bool is_int(Value* value) {
-    return value->tag == INTEGER_VALUE;
-}
-
-static bool is_double(Value* value) {
-    return value->tag == DOUBLE_VALUE;
-}
-
-static bool is_string(Value* value) {
-    return value->tag == STRING_VALUE;
-}
-
-static bool is_char(Value* value) {
-    return value->tag == CHAR_VALUE;
-}
-
-static bool is_bool(Value* value) {
-    return value->tag == BOOLEAN_VALUE;
-}
-
-static bool is_nil(Value* value) {
-    return value->tag == NIL_VALUE;
-}
-
-static bool is_same_type(Value* a, Value* b) {
-    return a->tag == b->tag;
+static bool is_same_type(ValueTag a, ValueTag b) {
+    return a == b;
 }
