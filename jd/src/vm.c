@@ -1,6 +1,7 @@
 #include "vm.h"
 #include "value.h"
 #include "opcode.h"
+#include "runtime_error.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -210,14 +211,14 @@ static void binary_op(VM* vm, OpCode code) {
         };break;
         case OP_DIVIDE: {
             if (is_int(a) && is_int(b)) {
-                if (b->as.i == 0); //ERROR
+                if (b->as.i == 0) runtime_error("Delenie nulov");
                 else {
                     int num = (a->as.i / b->as.i);
                     *res = (Value) { .tag = INTEGER_VALUE, .as = { .i = num } };
                     push(&vm->stack, res);
                 }
             }else if (is_double(a) && is_double(b)) {
-                if (b->as.i == 0); //ERROR
+                if (b->as.i == 0) runtime_error("Delenie nulov");
                 else {
                     double num = (a->as.d / b->as.d); 
                     *res = (Value) { .tag = DOUBLE_VALUE, .as = { .d = num } };

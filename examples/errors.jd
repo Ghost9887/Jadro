@@ -17,3 +17,6 @@ vytlac(nic == 3);
     b = 1;
 }
 b = 20;
+
+vytlac(4 / 0);
+vytlac(4.0 / 0.0);

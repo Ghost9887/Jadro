@@ -13,6 +13,7 @@ set(SOURCES
     src/variable.c
     src/environment.c
     src/debugger.c
+    src/runtime_error.c
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
