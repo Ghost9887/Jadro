@@ -1,17 +1,8 @@
-prem a = 5;
-prem b;
-vytlac(a);
-vytlac(b);
-{ 
-    b = 1;
-    vytlac(a);
-    vytlac(b);
-    a = 20;
-    vytlac(a);
-}
-vytlac(a);
+prem count = 5;
+prem str = "hello ";
+vytlac(str * count);
 
-prem i = 10;
-prem y = 5;
+prem a = 4;
+prem b = 1;
+vytlac(a < b);
 
-vytlac(i + y);

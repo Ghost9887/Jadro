@@ -50,6 +50,12 @@ void run(VM* vm) {
             case OP_MULTIPLY:
             case OP_DIVIDE:
             case OP_MODULO:
+            case OP_GREATER:
+            case OP_GREATER_EQUALS:
+            case OP_LESSER:
+            case OP_LESSER_EQUALS:
+            case OP_EQUALS_EQUALS:
+            case OP_NOT_EQUALS:
                 binary_op(vm, code); 
                 break; 
             case OP_PRINT: print_value(pop(&vm->stack)); break;
@@ -170,17 +176,151 @@ static void binary_op(VM* vm, OpCode code) {
                 };
                 push(&vm->stack, res);
             }
-            //TODO: ERROR
         };break;
-        case OP_SUBTRACT:
-        case OP_MULTIPLY:
-        case OP_DIVIDE:
-        case OP_GREATER:
-        case OP_GREATER_EQUALS:
-        case OP_LESSER:
-        case OP_LESSER_EQUALS:
-        case OP_EQUALS_EQUALS:
-        case OP_NOT_EQUALS:
+        case OP_SUBTRACT: {
+            if (is_int(a) && is_int(b)) {
+                int num = (a->as.i - b->as.i);
+                *res = (Value) { .tag = INTEGER_VALUE, .as = { .i = num } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                double num = (a->as.d - b->as.d);
+                *res = (Value) { .tag = DOUBLE_VALUE, .as = { .d = num } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_MULTIPLY: {
+            if (is_int(a) && is_int(b)) {
+                int num = (a->as.i * b->as.i);
+                *res = (Value) { .tag = INTEGER_VALUE, .as = { .i = num } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                double num = (a->as.d * b->as.d);
+                *res = (Value) { .tag = DOUBLE_VALUE, .as = { .d = num } };
+                push(&vm->stack, res);
+            }else if (is_string(a) && is_int(b)) {
+                char* new_str = (char*)malloc(sizeof(char) * (a->as.s.len * b->as.i));
+                for (int i = 0; i < b->as.i; i++) {
+                    memcpy(new_str + (a->as.s.len * i), a->as.s.ptr, a->as.s.len);
+                }
+                *res = (Value) { .tag = STRING_VALUE, .as = { .s = 
+                    (String) { .len = a->as.s.len * b->as.i, .ptr = new_str } 
+                } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_DIVIDE: {
+            if (is_int(a) && is_int(b)) {
+                if (b->as.i == 0); //ERROR
+                else {
+                    int num = (a->as.i / b->as.i);
+                    *res = (Value) { .tag = INTEGER_VALUE, .as = { .i = num } };
+                    push(&vm->stack, res);
+                }
+            }else if (is_double(a) && is_double(b)) {
+                if (b->as.i == 0); //ERROR
+                else {
+                    double num = (a->as.d / b->as.d); 
+                    *res = (Value) { .tag = DOUBLE_VALUE, .as = { .d = num } };
+                    push(&vm->stack, res);
+                }
+            }
+        };break;
+        case OP_GREATER: {
+            if (is_int(a) && is_int(b)) {
+                bool ans = (a->as.i > b->as.i);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                bool ans = (a->as.d > b->as.d);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_GREATER_EQUALS: {
+            if (is_int(a) && is_int(b)) {
+                bool ans = (a->as.i >= b->as.i);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                bool ans = (a->as.d >= b->as.d);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_LESSER: {
+            if (is_int(a) && is_int(b)) {
+                bool ans = (a->as.i < b->as.i);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                bool ans = (a->as.d < b->as.d);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_LESSER_EQUALS: {
+            if (is_int(a) && is_int(b)) {
+                bool ans = (a->as.i <= b->as.i);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                bool ans = (a->as.d <= b->as.d);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_EQUALS_EQUALS: {
+            if (is_int(a) && is_int(b)) {
+                bool ans = (a->as.i == b->as.i);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                bool ans = (b->as.d == b->as.d);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_char(a) && is_char(b)) {
+                bool ans = (a->as.c == b->as.c);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_string(a) && is_string(b)) {
+                bool ans = (memcmp(a->as.s.ptr, b->as.s.ptr, a->as.s.len) == 0);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_bool(a) && is_bool(b)) {
+                bool ans = (a->as.b == b->as.b);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_nil(a) && is_nil(b)) {
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = true } };
+                push(&vm->stack, res);
+            }
+        };break;
+        case OP_NOT_EQUALS: {
+            if (is_int(a) && is_int(b)) {
+                bool ans = (a->as.i != b->as.i);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_double(a) && is_double(b)) {
+                bool ans = (b->as.d != b->as.d);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_char(a) && is_char(b)) {
+                bool ans = (a->as.c != b->as.c);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_string(a) && is_string(b)) {
+                bool ans = (memcmp(a->as.s.ptr, b->as.s.ptr, a->as.s.len) != 0);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_bool(a) && is_bool(b)) {
+                bool ans = (a->as.b != b->as.b);
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = ans } };
+                push(&vm->stack, res);
+            }else if (is_nil(a) && is_nil(b)) {
+                *res = (Value) { .tag = BOOLEAN_VALUE, .as = { .b = false } };
+                push(&vm->stack, res);
+            }
+        };break;
         default: break; //unreachable
     }
 }
