@@ -27,7 +27,6 @@ void reallocate_var_arr(VariableArr* arr) {
 void free_var_arr(VariableArr* arr) {
     for (unsigned int i = 0; i < arr->count; i++) {
         free(arr->variables[i].value);
-        free((char*)arr->variables[i].name.ptr);
     }
     free(arr->variables);
 }

@@ -4,12 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static Stmnt statement(Parser* parser);
-static Stmnt expr_statement(Parser* parser);
-static Stmnt print_statement(Parser* parser);
-static Stmnt block_statement(Parser* parser);
-static Stmnt decl_statement(Parser* parser);
-static Stmnt assign_statement(Parser* parser);
+static Stmnt* statement(Parser* parser);
+static Stmnt* expr_statement(Parser* parser);
+static Stmnt* print_statement(Parser* parser);
+static Stmnt* block_statement(Parser* parser);
+static Stmnt* decl_statement(Parser* parser);
+static Stmnt* assign_statement(Parser* parser);
+static Stmnt* if_statement(Parser* parser);
 static Expr* expression(Parser* parser);
 static Expr* equality(Parser* parser);
 static Expr* comparison(Parser* parser);
@@ -39,16 +40,19 @@ void parse(Parser* parser) {
     }
 }
 
-static Stmnt statement(Parser* parser) {
+static Stmnt* statement(Parser* parser) {
     if (match(parser, 1, TOKEN_VYTLAC)) return print_statement(parser);
     if (match(parser, 1, TOKEN_LBRACE)) return block_statement(parser);
     if (match(parser, 1, TOKEN_PREM)) return decl_statement(parser);
     if (match(parser, 1, TOKEN_IDENTIFIER)) return assign_statement(parser);
+    if (match(parser, 1, TOKEN_AK)) return if_statement(parser);
     return expr_statement(parser);
 }
 
-static Stmnt expr_statement(Parser* parser) {
-    Stmnt stmnt = (Stmnt) {
+static Stmnt* expr_statement(Parser* parser) {
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+
+    *stmnt = (Stmnt) {
         .tag = EXPR_STMNT, 
         .as = { .exp = (ExprStmnt) { .expr = expression(parser) } } 
     };
@@ -56,18 +60,22 @@ static Stmnt expr_statement(Parser* parser) {
     return stmnt;
 }
 
-static Stmnt print_statement(Parser* parser) {
+static Stmnt* print_statement(Parser* parser) {
     consume(parser, TOKEN_LPAREN, "Ocakavany '('");
     Expr* expr = expression(parser);
     consume(parser, TOKEN_RPAREN, "Ocakavany ')'");
     consume(parser, TOKEN_SEMICOLON, "Ocakavany ';'");
-    return (Stmnt) {
+
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+    *stmnt = (Stmnt) {
         .tag = PRINT_STMNT,
         .as = { .exp = (ExprStmnt) { .expr = expr } }
     };
+
+    return stmnt;
 }
 
-static Stmnt block_statement(Parser* parser) {
+static Stmnt* block_statement(Parser* parser) {
     StmntArr* stmnts = (StmntArr*)malloc(sizeof(StmntArr));
     initialize_stmnt_arr(stmnts);
 
@@ -76,13 +84,16 @@ static Stmnt block_statement(Parser* parser) {
         stmnts->stmnts[stmnts->count++] = statement(parser);
     }
 
-    return (Stmnt) {
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+    *stmnt = (Stmnt) {
         .tag = BLOCK_STMNT,
         .as = { .blo = (BlockStmnt) { .stmnts = stmnts } } 
     };
+
+    return stmnt;
 }
 
-static Stmnt decl_statement(Parser* parser) {
+static Stmnt* decl_statement(Parser* parser) {
     consume(parser, TOKEN_IDENTIFIER, "Ocakavany identifikator");
     Token* prev = previous(parser);
     
@@ -101,22 +112,49 @@ static Stmnt decl_statement(Parser* parser) {
         };
     }
     
-    return (Stmnt) {
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+    *stmnt = (Stmnt) {
         .tag = DECL_STMNT,
         .as = { .dec = (DeclStmnt) { .name = prev->lexeme, .expr = expr, .token = prev } }
     };
+
+    return stmnt;
 }
 
-static Stmnt assign_statement(Parser* parser) {
+static Stmnt* assign_statement(Parser* parser) {
     Token* prev = previous(parser);
     consume(parser, TOKEN_EQUALS, "Ocakavany '='");
     Expr* expr = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Ocakavany ';'");
 
-    return (Stmnt) {
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+    *stmnt = (Stmnt) {
         .tag = ASSIGN_STMNT,
         .as = { .ass = (AssignStmnt) { .name = prev->lexeme, .expr = expr, .token = prev } }
     };
+
+    return stmnt;
+}
+
+static Stmnt* if_statement(Parser* parser) {
+    consume(parser, TOKEN_LPAREN, "Ocakavany '('");
+    Token* prev = previous(parser);
+    Expr* expr = expression(parser);
+    consume(parser, TOKEN_RPAREN, "Ocakavany ')'");
+    Stmnt* body = statement(parser);
+
+    Stmnt* else_body = NULL;
+    if (match(parser, 1, TOKEN_INAK)) {
+        else_body = statement(parser);
+    }
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+
+    *stmnt = (Stmnt) {
+        .tag = IF_STMNT,
+        .as = { .ifs = (IfStmnt) { .condition = expr, .body = body, .else_body = else_body, .token = prev } }
+    };
+
+    return stmnt;
 }
 
 static Expr* expression(Parser* parser) {

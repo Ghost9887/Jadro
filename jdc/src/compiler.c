@@ -2,6 +2,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef struct {
+    int from;
+    int to;
+}Jump;
+
 void initialize_compiler(Compiler* compiler, StmntArr* stmnt_arr, const char* output_file_name) {
     compiler->stmnt_arr = stmnt_arr;
     compiler->output_file = 
@@ -9,6 +14,10 @@ void initialize_compiler(Compiler* compiler, StmntArr* stmnt_arr, const char* ou
 }
 
 static void write_code(Compiler* compiler, OpCode code);
+static void write_value(Compiler* compiler, Value* value);
+static Jump write_empty_jump(Compiler* compiler);
+static unsigned int get_pos(Compiler* compiler);
+static void fill_jump(Compiler* compiler, Jump* jump);
 static void evaluate(Compiler* compiler, Stmnt* stmnt);
 static void execute(Compiler* compiler, Expr* expr);
 static void expr_statement(Compiler* compiler, ExprStmnt* stmnt);
@@ -16,6 +25,7 @@ static void print_statement(Compiler* compiler, PrintStmnt* stmnt);
 static void block_statement(Compiler* compiler, BlockStmnt* stmnt);
 static void decl_statement(Compiler* compiler, DeclStmnt* stmnt);
 static void assign_statement(Compiler* compiler, AssignStmnt* stmnt);
+static void if_statement(Compiler* compiler, IfStmnt* stmnt);
 static void binary_expression(Compiler* compiler, BinaryExpr* expr);
 static void unary_expression(Compiler* compiler, UnaryExpr* expr);
 static void value_expression(Compiler* compiler, ValueExpr* expr);
@@ -23,7 +33,7 @@ static void var_expression(Compiler* compiler, VariableExpr* expr);
 
 void compile(Compiler* compiler) {
     for (unsigned int i = 0; i < compiler->stmnt_arr->count; i++) {
-        evaluate(compiler, &compiler->stmnt_arr->stmnts[i]);
+        evaluate(compiler, compiler->stmnt_arr->stmnts[i]);
     }
     write_code(compiler, OP_END);
     fclose(compiler->output_file);
@@ -67,6 +77,23 @@ static void write_value(Compiler* compiler, Value* value) {
     }
 }
 
+static Jump write_empty_jump(Compiler* compiler) {
+    Value temp = (Value) { .tag = INTEGER_VALUE, .as = { .i = 0 } };
+    write_code(compiler, OP_JUMP);
+    write_value(compiler, &temp);
+    Jump jump = (Jump) { .from = get_pos(compiler), .to = 0 };
+    return jump;
+}
+
+static void fill_jump(Compiler* compiler, Jump* jump) {
+    fseek(compiler->output_file, (jump->from - sizeof(int) - 1), SEEK_SET);
+
+    Value jump_size = (Value) { .tag = INTEGER_VALUE, .as = { .i = (int)((int)jump->to - (int)jump->from) } };
+    write_value(compiler, &jump_size);
+
+    fseek(compiler->output_file, 0, SEEK_END);
+}
+
 static void evaluate(Compiler* compiler, Stmnt* stmnt) {
     switch (stmnt->tag) {
         case EXPR_STMNT: expr_statement(compiler, &stmnt->as.exp); break;
@@ -74,6 +101,7 @@ static void evaluate(Compiler* compiler, Stmnt* stmnt) {
         case BLOCK_STMNT: block_statement(compiler, &stmnt->as.blo); break;
         case DECL_STMNT: decl_statement(compiler, &stmnt->as.dec); break;
         case ASSIGN_STMNT: assign_statement(compiler, &stmnt->as.ass); break;
+        case IF_STMNT: if_statement(compiler, &stmnt->as.ifs); break;
     }
 }
 
@@ -98,7 +126,7 @@ static void print_statement(Compiler* compiler, PrintStmnt* stmnt) {
 static void block_statement(Compiler* compiler, BlockStmnt* stmnt) {
     write_code(compiler, OP_NEW_ENV);
     for (unsigned int i = 0; i < stmnt->stmnts->count; i++) {
-        evaluate(compiler, &stmnt->stmnts->stmnts[i]);
+        evaluate(compiler, stmnt->stmnts->stmnts[i]);
     }
     write_code(compiler, OP_DELETE_ENV);
 }
@@ -115,6 +143,23 @@ static void assign_statement(Compiler* compiler, AssignStmnt* stmnt) {
     Value temp = (Value) { .tag = STRING_VALUE, .as = { .s = stmnt->name } };
     write_value(compiler, &temp);
     write_code(compiler, OP_ASSIGN);
+}
+
+static void if_statement(Compiler* compiler, IfStmnt* stmnt) {
+    execute(compiler, stmnt->condition);
+    write_code(compiler, OP_IF);
+    Jump if_jmp = write_empty_jump(compiler);
+    evaluate(compiler, stmnt->body);
+    if (stmnt->else_body != NULL) {
+        Jump els_jmp = write_empty_jump(compiler);
+        if_jmp.to = get_pos(compiler);
+        evaluate(compiler, stmnt->else_body);
+        els_jmp.to = get_pos(compiler);
+        fill_jump(compiler, &els_jmp);
+    }else {
+        if_jmp.to = get_pos(compiler);
+    }
+    fill_jump(compiler, &if_jmp);
 }
 
 static void binary_expression(Compiler* compiler, BinaryExpr* expr) {
@@ -150,4 +195,9 @@ static void var_expression(Compiler* compiler, VariableExpr* expr) {
     Value temp = (Value) { .tag = STRING_VALUE, .as = { .s = expr->name } };
     write_value(compiler, &temp);
     write_code(compiler, OP_VAR);
+}
+
+static unsigned int get_pos(Compiler* compiler) {
+    fseek(compiler->output_file, 0, SEEK_CUR);
+    return ftell(compiler->output_file);
 }

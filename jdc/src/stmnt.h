@@ -3,6 +3,7 @@
 
 #include "expr.h"
 
+typedef struct Stmnt Stmnt;
 typedef struct StmntArr StmntArr;
 
 typedef struct {
@@ -29,15 +30,23 @@ typedef struct {
     Token* token;
 }AssignStmnt;
 
+typedef struct {
+    Expr* condition;
+    Stmnt* body;
+    Stmnt* else_body;
+    Token* token;
+}IfStmnt;
+
 typedef enum {
     EXPR_STMNT,
     PRINT_STMNT,
     BLOCK_STMNT,
     DECL_STMNT,
     ASSIGN_STMNT,
+    IF_STMNT
 }StmntTag;
 
-typedef struct {
+typedef struct Stmnt {
     StmntTag tag;
     union {
         ExprStmnt exp;
@@ -45,18 +54,18 @@ typedef struct {
         BlockStmnt blo;
         DeclStmnt dec;
         AssignStmnt ass;
+        IfStmnt ifs;
     }as;
 }Stmnt;
 
 typedef struct StmntArr{
     unsigned int count;
     unsigned int capacity;
-    Stmnt* stmnts;
+    Stmnt** stmnts;
 }StmntArr;
 
 void print_stmnt(Stmnt* stmnt);
 void initialize_stmnt_arr(StmntArr* arr);
 void reallocate_stmnt_arr(StmntArr* arr);
-void free_stmnt_arr(StmntArr* arr);
 
 #endif

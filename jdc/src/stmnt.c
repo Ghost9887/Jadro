@@ -17,7 +17,7 @@ void print_stmnt(Stmnt* stmnt) {
         case BLOCK_STMNT:
             printf("BlockStmnt[");
             for (int i = 0; i < (int)stmnt->as.blo.stmnts->count; i++) {
-                print_stmnt(&stmnt->as.blo.stmnts->stmnts[i]);
+                print_stmnt(stmnt->as.blo.stmnts->stmnts[i]);
             }
             printf("]");
             break;
@@ -31,13 +31,24 @@ void print_stmnt(Stmnt* stmnt) {
             print_expr(stmnt->as.dec.expr);
             printf("]");
             break;
+        case IF_STMNT:
+            printf("IfStmnt[ (");
+            print_expr(stmnt->as.ifs.condition);
+            printf(") { ");
+            print_stmnt(stmnt->as.ifs.body);
+            if (stmnt->as.ifs.else_body != NULL) {
+                printf("} ");
+                print_stmnt(stmnt->as.ifs.else_body);
+            }
+            printf("]");
+            break;
     }
 }
 
 void initialize_stmnt_arr(StmntArr* arr) {
     arr->count = 0;
     arr->capacity = 2;
-    arr->stmnts = (Stmnt*)malloc(sizeof(Stmnt) * arr->capacity);
+    arr->stmnts = (Stmnt**)malloc(sizeof(Stmnt*) * arr->capacity);
 
     if (arr->stmnts == NULL) {
         printf("Nepodarilo sa vytvorit pole Statement\n");
@@ -48,16 +59,11 @@ void initialize_stmnt_arr(StmntArr* arr) {
 void reallocate_stmnt_arr(StmntArr* arr) {
     if (arr->count + 1 > arr->capacity) {
         arr->capacity *= 2;
-        arr->stmnts = (Stmnt*)realloc(arr->stmnts, sizeof(Stmnt) * arr->capacity);
+        arr->stmnts = (Stmnt**)realloc(arr->stmnts, sizeof(Stmnt*) * arr->capacity);
 
         if (arr->stmnts == NULL) {
             printf("Nepodarilo sa zvacsit statement pole\n");
             exit(1);
         }
     }
-}
-
-void free_stmnt_arr(StmntArr* arr) {
-    free(arr->stmnts);
-    arr->stmnts = NULL;
 }

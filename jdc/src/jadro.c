@@ -41,7 +41,7 @@ void run(const char* input, const char* output_file_name) {
 #ifdef DEBUG
     printf("\n---AST---\n");
     for (int i = 0; i < (int)stmnts.count; i++) {
-        print_stmnt(&stmnts.stmnts[i]);
+        print_stmnt(stmnts.stmnts[i]);
         printf("\n");
     }
 #endif

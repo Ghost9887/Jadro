@@ -26,6 +26,8 @@ typedef enum {
     OP_PRINT,
     OP_NEW_ENV,
     OP_DELETE_ENV,
+    OP_IF,
+    OP_JUMP,
     OP_END
 }OpCode;
 

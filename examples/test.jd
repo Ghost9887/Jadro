@@ -5,5 +5,37 @@ vytlac(str * count);
 prem a = 4;
 prem b = 1;
 vytlac(a < b);
-vytlac(4 / 0);
-vytlac(4.0 / 0.0);
+
+ak (a == 4) {
+    vytlac("a == 4");
+}inak {
+    vytlac("a != 4");
+}
+
+ak (a == 5) {
+    vytlac("a == 5");
+}inak {
+    vytlac("a != 5");
+}
+
+ak (b == 1) {
+    prem x = 10;
+    prem y = 2;
+    vytlac(x * y);
+}inak {
+    prem x = 5;
+    prem y = 2;
+    vytlac(x * y);
+}
+
+ak (b == 0) {
+    prem x = 10;
+    prem y = 2;
+    vytlac(x * y);
+}inak {
+    prem x = 5;
+    prem y = 2;
+    vytlac(x * y);
+}
+
+vytlac("end");

@@ -12,6 +12,7 @@ static void print_statement(SemanticChecker* checker, PrintStmnt* stmnt);
 static void block_statement(SemanticChecker* checker, BlockStmnt* stmnt);
 static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt);
 static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt);
+static void if_statement(SemanticChecker* checker, IfStmnt* stmnt);
 static void binary_expression(SemanticChecker* checker, BinaryExpr* expr);
 static void unary_expression(SemanticChecker* checker, UnaryExpr* expr);
 static void value_expression(SemanticChecker* checker, ValueExpr* expr);
@@ -28,7 +29,7 @@ void initialize_semantic_checker(SemanticChecker* checker) {
 
 void semantic_check(SemanticChecker* checker, StmntArr* stmnts) {
     for (unsigned int i = 0; i < stmnts->count; i++) {
-        evaluate(checker, &stmnts->stmnts[i]);
+        evaluate(checker, stmnts->stmnts[i]);
     }
 }
 
@@ -39,6 +40,7 @@ static void evaluate(SemanticChecker* checker, Stmnt* stmnt) {
         case BLOCK_STMNT: block_statement(checker, &stmnt->as.blo); break;
         case DECL_STMNT: decl_statement(checker, &stmnt->as.dec); break;
         case ASSIGN_STMNT: assign_statement(checker, &stmnt->as.ass); break;
+        case IF_STMNT: if_statement(checker, &stmnt->as.ifs); break;
     }
 }
 
@@ -62,7 +64,7 @@ static void print_statement(SemanticChecker* checker, PrintStmnt* stmnt) {
 static void block_statement(SemanticChecker* checker, BlockStmnt* stmnt) {
     create_new_env(checker);
     for (unsigned int i = 0; i < stmnt->stmnts->count; i++) {
-        evaluate(checker, &stmnt->stmnts->stmnts[i]);
+        evaluate(checker, stmnt->stmnts->stmnts[i]);
     }
     destroy_current_env(checker);
 }
@@ -85,6 +87,21 @@ static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt) {
     }
     else {
         var->value = val;
+    }
+}
+
+static void if_statement(SemanticChecker* checker, IfStmnt* stmnt) {
+    execute(checker, stmnt->condition);
+
+    ValueTag condition = pop(&checker->stack);
+
+    if (condition != BOOLEAN_VALUE) {
+        error(stmnt->token, "Podmienka musi by vyhodnotena boolom");
+    }
+
+    evaluate(checker, stmnt->body);
+    if (stmnt->else_body != NULL) {
+        evaluate(checker, stmnt->else_body);
     }
 }
 

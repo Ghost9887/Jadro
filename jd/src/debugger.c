@@ -86,6 +86,8 @@ int print_instruction(VM* vm, int offset) {
         case OP_PRINT: return print_simple_instruction("OP_PRINT", offset);
         case OP_NEW_ENV: return print_simple_instruction("OP_NEW_ENV", offset);
         case OP_DELETE_ENV: return print_simple_instruction("OP_DELETE_ENV", offset);
+        case OP_IF: return print_simple_instruction("OP_IF", offset);
+        case OP_JUMP: return print_simple_instruction("OP_JUMP", offset);
         case OP_END: return print_end_instruction();
     }
     printf("UKNOWN CODE\n"); return ++offset;

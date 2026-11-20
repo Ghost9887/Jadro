@@ -7,14 +7,14 @@
 typedef struct Expr Expr;
 
 typedef struct {
-    struct Expr* left;
+    Expr* left;
     Token* op;
-    struct Expr* right;
+    Expr* right;
 }BinaryExpr;
 
 typedef struct {
     Token* op;
-    struct Expr* right;
+    Expr* right;
 }UnaryExpr;
 
 typedef struct {

@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define JUMP_SIZE (1 + 1 + sizeof(int))
+
 void initialize_vm(VM* vm, const char* bytes) {
     vm->ip = 0;
     vm->bytes = bytes;
@@ -34,6 +36,8 @@ static void destroy_current_env(VM* vm);
 static void declare_var(VM* vm);
 static void assign_var(VM* vm);
 static void var(VM* vm);
+static void if_statement(VM* vm);
+static void jump_statement(VM* vm);
 
 void run(VM* vm) {
     bool running = true;
@@ -65,8 +69,10 @@ void run(VM* vm) {
             case OP_VAR: var(vm); break;
             case OP_NEW_ENV: create_new_env(vm); break;
             case OP_DELETE_ENV: destroy_current_env(vm); break;
+            case OP_IF: if_statement(vm); break;
+            case OP_JUMP: jump_statement(vm); break;
             case OP_END: running = false; break;
-            default: printf("Uknown code\n"); break;
+            default: printf("Uknown code\n"); exit(1); break;
         }
     }
 }
@@ -352,4 +358,18 @@ static void create_new_env(VM* vm) {
 
 static void destroy_current_env(VM* vm) {
     destroy_env(&vm->env_arr[vm->current_env--]);
+}
+
+static void if_statement(VM* vm) {
+    Value* condition = pop(&vm->stack);
+    if (condition->as.b) {
+        vm->ip += JUMP_SIZE;
+    }
+}
+
+static void jump_statement(VM* vm) {
+    vm->ip++;
+    push_int(vm);
+    Value* jump_size = pop(&vm->stack);
+    vm->ip += jump_size->as.i;
 }

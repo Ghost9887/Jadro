@@ -20,3 +20,7 @@ b = 20;
 
 vytlac(4 / 0);
 vytlac(4.0 / 0.0);
+
+ak (-3) {
+    vytlac("a");
+}
