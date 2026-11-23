@@ -45,3 +45,7 @@ pokial (index < 10) {
 }
 
 vytlac("end");
+
+fn add (prem a, prem b) {
+    vratit a + b;
+}

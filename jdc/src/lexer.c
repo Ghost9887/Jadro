@@ -102,12 +102,14 @@ static char peek(Lexer* lexer) {
 
 static TokenType check_keyword(const char* identifier) {
     if (memcmp("prem", identifier, 4) == 0) return TOKEN_PREM; 
+    else if (memcmp("fn", identifier, 2) == 0) return TOKEN_FUNK;
     else if (memcmp("ak", identifier, 2) == 0) return TOKEN_AK;
     else if (memcmp("inak", identifier, 4) == 0) return TOKEN_INAK;
     else if (memcmp("pokial", identifier, 6) == 0) return TOKEN_POKIAL;
     else if (memcmp("nic", identifier, 3) == 0) return TOKEN_NIL;
     else if (memcmp("vytlac", identifier, 6) == 0) return TOKEN_VYTLAC;
     else if (memcmp("nacitat", identifier, 7) == 0) return TOKEN_NACITAT;
+    else if (memcmp("vratit", identifier, 6) == 0) return TOKEN_VRATIT;
     else return TOKEN_IDENTIFIER;
 }
 

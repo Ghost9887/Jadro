@@ -12,6 +12,8 @@ static Stmnt* decl_statement(Parser* parser);
 static Stmnt* assign_statement(Parser* parser);
 static Stmnt* if_statement(Parser* parser);
 static Stmnt* while_statement(Parser* parser);
+static Stmnt* funk_decl_statement(Parser* parser);
+static Stmnt* return_statement(Parser* parser);
 static Expr* expression(Parser* parser);
 static Expr* equality(Parser* parser);
 static Expr* comparison(Parser* parser);
@@ -48,6 +50,8 @@ static Stmnt* statement(Parser* parser) {
     if (match(parser, 1, TOKEN_IDENTIFIER)) return assign_statement(parser);
     if (match(parser, 1, TOKEN_AK)) return if_statement(parser);
     if (match(parser, 1, TOKEN_POKIAL)) return while_statement(parser);
+    if (match(parser, 1, TOKEN_FUNK)) return funk_decl_statement(parser);
+    if (match(parser, 1, TOKEN_VRATIT)) return return_statement(parser);
     return expr_statement(parser);
 }
 
@@ -106,6 +110,7 @@ static Stmnt* decl_statement(Parser* parser) {
         expr = expression(parser);
     }
     consume(parser, TOKEN_SEMICOLON, "Ocakavany ';'");
+
     if (!has_value) {
         expr = malloc(sizeof(Expr));
         *expr = (Expr) {
@@ -173,6 +178,59 @@ static Stmnt* while_statement(Parser* parser) {
         .as = { .whi = (WhileStmnt) { .condition = expr, .body = body, .token = prev } }
     };
 
+    return stmnt;
+}
+
+static Stmnt* funk_decl_statement(Parser* parser) {
+    consume(parser, TOKEN_IDENTIFIER, "Ockavany nazov funkcie");
+    String name = previous(parser)->lexeme;
+    consume(parser, TOKEN_LPAREN, "Ocakavany '('");
+
+    StmntArr* stmnts = (StmntArr*)malloc(sizeof(StmntArr));
+    initialize_stmnt_arr(stmnts);
+    while (!match(parser, 1, TOKEN_RPAREN)) {
+        if (stmnts->count > 0) consume(parser, TOKEN_COMMA, "Ocakavany oddelovaci znak ','");
+        consume(parser, TOKEN_PREM, "Ocakavana deklaracia premennej");
+        consume(parser, TOKEN_IDENTIFIER, "Ocakavany nazov premennej");
+        
+        Expr* expr;
+        if (match(parser, 1, TOKEN_EQUALS)) {
+            expr = expression(parser);
+        }else {
+            expr = malloc(sizeof(Expr));
+            *expr = (Expr) {
+                .tag = VALUE_EXPR,
+                .as = { .val = (ValueExpr) { .value = (Value) { .tag = NIL_VALUE, .as = { .n = NULL } } } }
+            };
+        }
+        
+        Stmnt* expr_stmnt = malloc(sizeof(Stmnt));
+        *expr_stmnt = (Stmnt) {
+            .tag = EXPR_STMNT,
+            .as = { .exp = (ExprStmnt) { .expr = expr } }
+        };
+        stmnts->stmnts[stmnts->count++] = expr_stmnt;
+    }
+
+    Stmnt* body = statement(parser);
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+    *stmnt = (Stmnt) {
+        .tag = FUNK_DECL_STMNT,
+        .as = { .fun = (FunkDeclStmnt) { .name = name, .params = stmnts, .body = body } }
+    };
+
+    return stmnt;
+}
+
+static Stmnt* return_statement(Parser* parser) {
+    Expr* expr = expression(parser);
+
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+    *stmnt = (Stmnt) {
+        .tag = RETURN_STMNT,
+        .as = { .ret = (ReturnStmnt) { .expr = expr } } 
+    };
+    consume(parser, TOKEN_SEMICOLON, "Ocakavany ';'");
     return stmnt;
 }
 

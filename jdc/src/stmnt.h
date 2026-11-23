@@ -43,6 +43,16 @@ typedef struct {
     Token* token;
 }WhileStmnt;
 
+typedef struct {
+    String name;
+    StmntArr* params;
+    Stmnt* body;
+}FunkDeclStmnt;
+
+typedef struct {
+    Expr* expr;
+}ReturnStmnt;
+
 typedef enum {
     EXPR_STMNT,
     PRINT_STMNT,
@@ -50,7 +60,9 @@ typedef enum {
     DECL_STMNT,
     ASSIGN_STMNT,
     IF_STMNT,
-    WHILE_STMNT
+    WHILE_STMNT,
+    FUNK_DECL_STMNT,
+    RETURN_STMNT
 }StmntTag;
 
 typedef struct Stmnt {
@@ -63,6 +75,8 @@ typedef struct Stmnt {
         AssignStmnt ass;
         IfStmnt ifs;
         WhileStmnt whi;
+        FunkDeclStmnt fun;
+        ReturnStmnt ret;
     }as;
 }Stmnt;
 
