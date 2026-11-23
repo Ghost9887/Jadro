@@ -2,6 +2,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void initialize_expr_arr(ExprArr* arr) {
+    arr->capacity = 2;
+    arr->count = 0;
+    arr->exprs = (Expr**)malloc(sizeof(Expr*) * arr->capacity);
+    if (arr->exprs == NULL) {
+        printf("Nepodarilo sa allocovat ExprArr\n");
+        exit(1);
+    }
+}
+
+void reallocate_expr_arr(ExprArr* arr) {
+    if (arr->count + 1 > arr->capacity) {
+        arr->capacity *= 2;
+        arr->exprs = (Expr**)realloc(arr->exprs, sizeof(Expr*) * arr->capacity);
+
+        if (arr->exprs == NULL) {
+            printf("Nepodarilo sa reallocovat ExprArr\n");
+            exit(1);
+        }
+    }
+}
+
 void print_expr(Expr* expr) {
     switch (expr->tag) {
         case BINARY_EXPR: 
@@ -27,6 +49,14 @@ void print_expr(Expr* expr) {
             break;
         case VARIABLE_EXPR:
             printf("VariableExpr[%.*s]", expr->as.var.name.len, expr->as.var.name.ptr);
+            break;
+        case FUNK_CALL_EXPR:
+            printf("FunkCallExpr[ %.*s ", expr->as.fun.name.len, expr->as.fun.name.ptr);
+            for (unsigned int i = 0; i < expr->as.fun.params->count; i++) {
+                print_expr(expr->as.fun.params->exprs[i]);
+                printf(", ");
+            }
+            printf("]");
             break;
     }
 }

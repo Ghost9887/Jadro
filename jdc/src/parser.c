@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_PARAM_COUNT 256
+
 static Stmnt* statement(Parser* parser);
 static Stmnt* expr_statement(Parser* parser);
 static Stmnt* print_statement(Parser* parser);
@@ -182,7 +184,6 @@ static Stmnt* while_statement(Parser* parser) {
 }
 
 static Stmnt* funk_impl_statement(Parser* parser) {
-    const int max_params = 256;
     consume(parser, TOKEN_IDENTIFIER, "Ockavany nazov funkcie");
     String name = previous(parser)->lexeme;
     consume(parser, TOKEN_LPAREN, "Ocakavany '('");
@@ -190,7 +191,8 @@ static Stmnt* funk_impl_statement(Parser* parser) {
     StmntArr* stmnts = (StmntArr*)malloc(sizeof(StmntArr));
     initialize_stmnt_arr(stmnts);
     while (!match(parser, 1, TOKEN_RPAREN)) {
-        if (stmnts->count > max_params) parse_error(parser, "Maxmialny pocet parametrov je 256");
+        reallocate_stmnt_arr(stmnts);
+        if (stmnts->count > MAX_PARAM_COUNT) parse_error(parser, "Maxmialny pocet parametrov je 256");
         if (stmnts->count > 0) consume(parser, TOKEN_COMMA, "Ocakavany oddelovaci znak ','");
         consume(parser, TOKEN_PREM, "Ocakavana deklaracia premennej");
         consume(parser, TOKEN_IDENTIFIER, "Ocakavany nazov premennej");
@@ -332,8 +334,7 @@ static Expr* unary(Parser* parser) {
     return primary(parser);
 }
 
-static Expr* primary(Parser* parser) {
-    Expr* expr = malloc(sizeof(Expr));
+static Expr* primary(Parser* parser) { Expr* expr = malloc(sizeof(Expr));
     
     if (match(parser, 6, TOKEN_STRING, TOKEN_CHAR, TOKEN_INTEGER, TOKEN_DOUBLE, TOKEN_BOOLEAN, TOKEN_NIL)) {
         Token* prev = previous(parser);
@@ -345,11 +346,32 @@ static Expr* primary(Parser* parser) {
     }
     if (match(parser, 1, TOKEN_IDENTIFIER)) {
         Token* prev = previous(parser);
-        *expr = (Expr) {
-            .tag = VARIABLE_EXPR,
-            .as = { .var = (VariableExpr) { .name = prev->lexeme, .token = prev } }
-        };
-        return expr;
+        if (match(parser, 1, TOKEN_LPAREN)) {
+            ExprArr* expr_arr = (ExprArr*)malloc(sizeof(ExprArr));
+            initialize_expr_arr(expr_arr);
+            while (!match(parser, 1, TOKEN_RPAREN)) {
+                if (expr_arr->count > 0) {
+                    consume(parser, TOKEN_COMMA, "Ocakavany oddelovaci znak ','");
+                }
+                if (expr_arr->count > MAX_PARAM_COUNT) { 
+                    parse_error(parser, "Maxmialny pocet parametrov je 256");
+                }
+                reallocate_expr_arr(expr_arr);
+                expr_arr->exprs[expr_arr->count++] = expression(parser);
+            }
+
+            *expr = (Expr) {
+                .tag = FUNK_CALL_EXPR,
+                .as = { .fun = (FunkCallExpr) { .name = prev->lexeme, .params = expr_arr } }
+            };
+            return expr;
+        }else {
+            *expr = (Expr) {
+                .tag = VARIABLE_EXPR,
+                .as = { .var = (VariableExpr) { .name = prev->lexeme, .token = prev } }
+            };
+            return expr;
+        }
     }
 
     parse_error(parser, "Ocakavana podmienka");
