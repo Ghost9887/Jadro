@@ -40,7 +40,14 @@ void print_stmnt(Stmnt* stmnt) {
                 printf("} ");
                 print_stmnt(stmnt->as.ifs.else_body);
             }
-            printf("]");
+            printf("} ]");
+            break;
+        case WHILE_STMNT:
+            printf("WhileStmnt[ (");
+            print_expr(stmnt->as.whi.condition);
+            printf(" ) { ");
+            print_stmnt(stmnt->as.whi.body);
+            printf("} ]");
             break;
     }
 }

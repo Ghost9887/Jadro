@@ -30,6 +30,7 @@ typedef enum {
     OP_NEW_ENV,
     OP_DELETE_ENV,
     OP_IF,
+    OP_WHILE,
     OP_JUMP,
     OP_END
 }OpCode;

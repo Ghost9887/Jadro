@@ -37,6 +37,7 @@ static void declare_var(VM* vm);
 static void assign_var(VM* vm);
 static void var(VM* vm);
 static void if_statement(VM* vm);
+static void while_statement(VM* vm);
 static void jump_statement(VM* vm);
 
 void run(VM* vm) {
@@ -70,6 +71,7 @@ void run(VM* vm) {
             case OP_NEW_ENV: create_new_env(vm); break;
             case OP_DELETE_ENV: destroy_current_env(vm); break;
             case OP_IF: if_statement(vm); break;
+            case OP_WHILE: while_statement(vm); break;
             case OP_JUMP: jump_statement(vm); break;
             case OP_END: running = false; break;
             default: printf("Uknown code\n"); exit(1); break;
@@ -361,6 +363,13 @@ static void destroy_current_env(VM* vm) {
 }
 
 static void if_statement(VM* vm) {
+    Value* condition = pop(&vm->stack);
+    if (condition->as.b) {
+        vm->ip += JUMP_SIZE;
+    }
+}
+
+static void while_statement(VM* vm) {
     Value* condition = pop(&vm->stack);
     if (condition->as.b) {
         vm->ip += JUMP_SIZE;

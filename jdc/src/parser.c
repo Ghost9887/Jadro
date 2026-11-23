@@ -11,6 +11,7 @@ static Stmnt* block_statement(Parser* parser);
 static Stmnt* decl_statement(Parser* parser);
 static Stmnt* assign_statement(Parser* parser);
 static Stmnt* if_statement(Parser* parser);
+static Stmnt* while_statement(Parser* parser);
 static Expr* expression(Parser* parser);
 static Expr* equality(Parser* parser);
 static Expr* comparison(Parser* parser);
@@ -46,6 +47,7 @@ static Stmnt* statement(Parser* parser) {
     if (match(parser, 1, TOKEN_PREM)) return decl_statement(parser);
     if (match(parser, 1, TOKEN_IDENTIFIER)) return assign_statement(parser);
     if (match(parser, 1, TOKEN_AK)) return if_statement(parser);
+    if (match(parser, 1, TOKEN_POKIAL)) return while_statement(parser);
     return expr_statement(parser);
 }
 
@@ -152,6 +154,23 @@ static Stmnt* if_statement(Parser* parser) {
     *stmnt = (Stmnt) {
         .tag = IF_STMNT,
         .as = { .ifs = (IfStmnt) { .condition = expr, .body = body, .else_body = else_body, .token = prev } }
+    };
+
+    return stmnt;
+}
+
+static Stmnt* while_statement(Parser* parser) {
+    consume(parser, TOKEN_LPAREN, "Ocakavany '('");
+    Token* prev = previous(parser);
+    Expr* expr = expression(parser);
+    consume(parser, TOKEN_RPAREN, "Ocakavany ')'");
+    Stmnt* body = statement(parser);
+
+    Stmnt* stmnt = malloc(sizeof(Stmnt));
+
+    *stmnt = (Stmnt) {
+        .tag = WHILE_STMNT,
+        .as = { .whi = (WhileStmnt) { .condition = expr, .body = body, .token = prev } }
     };
 
     return stmnt;

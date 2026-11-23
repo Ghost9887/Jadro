@@ -38,4 +38,10 @@ ak (b == 0) {
     vytlac(x * y);
 }
 
+prem index = 0;
+pokial (index < 10) {
+    vytlac(index + 1);
+    index = index + 1;
+}
+
 vytlac("end");

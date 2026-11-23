@@ -26,6 +26,7 @@ static void block_statement(Compiler* compiler, BlockStmnt* stmnt);
 static void decl_statement(Compiler* compiler, DeclStmnt* stmnt);
 static void assign_statement(Compiler* compiler, AssignStmnt* stmnt);
 static void if_statement(Compiler* compiler, IfStmnt* stmnt);
+static void while_statement(Compiler* compiler, WhileStmnt* stmnt);
 static void binary_expression(Compiler* compiler, BinaryExpr* expr);
 static void unary_expression(Compiler* compiler, UnaryExpr* expr);
 static void value_expression(Compiler* compiler, ValueExpr* expr);
@@ -102,6 +103,7 @@ static void evaluate(Compiler* compiler, Stmnt* stmnt) {
         case DECL_STMNT: decl_statement(compiler, &stmnt->as.dec); break;
         case ASSIGN_STMNT: assign_statement(compiler, &stmnt->as.ass); break;
         case IF_STMNT: if_statement(compiler, &stmnt->as.ifs); break;
+        case WHILE_STMNT: while_statement(compiler, &stmnt->as.whi); break;
     }
 }
 
@@ -160,6 +162,19 @@ static void if_statement(Compiler* compiler, IfStmnt* stmnt) {
         if_jmp.to = get_pos(compiler);
     }
     fill_jump(compiler, &if_jmp);
+}
+
+static void while_statement(Compiler* compiler, WhileStmnt* stmnt) {
+    unsigned int start_pos = get_pos(compiler);
+    execute(compiler, stmnt->condition);
+    write_code(compiler, OP_WHILE);
+    Jump skip_while = write_empty_jump(compiler);
+    evaluate(compiler, stmnt->body);
+    Jump go_back = write_empty_jump(compiler);
+    go_back.to = start_pos;
+    fill_jump(compiler, &go_back);
+    skip_while.to = get_pos(compiler);
+    fill_jump(compiler, &skip_while);
 }
 
 static void binary_expression(Compiler* compiler, BinaryExpr* expr) {

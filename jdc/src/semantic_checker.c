@@ -13,6 +13,7 @@ static void block_statement(SemanticChecker* checker, BlockStmnt* stmnt);
 static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt);
 static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt);
 static void if_statement(SemanticChecker* checker, IfStmnt* stmnt);
+static void while_statement(SemanticChecker* checker, WhileStmnt* stmnt);
 static void binary_expression(SemanticChecker* checker, BinaryExpr* expr);
 static void unary_expression(SemanticChecker* checker, UnaryExpr* expr);
 static void value_expression(SemanticChecker* checker, ValueExpr* expr);
@@ -41,6 +42,7 @@ static void evaluate(SemanticChecker* checker, Stmnt* stmnt) {
         case DECL_STMNT: decl_statement(checker, &stmnt->as.dec); break;
         case ASSIGN_STMNT: assign_statement(checker, &stmnt->as.ass); break;
         case IF_STMNT: if_statement(checker, &stmnt->as.ifs); break;
+        case WHILE_STMNT: while_statement(checker, &stmnt->as.whi); break;
     }
 }
 
@@ -103,6 +105,17 @@ static void if_statement(SemanticChecker* checker, IfStmnt* stmnt) {
     if (stmnt->else_body != NULL) {
         evaluate(checker, stmnt->else_body);
     }
+}
+
+static void while_statement(SemanticChecker* checker, WhileStmnt* stmnt) {
+    execute(checker, stmnt->condition);
+
+    ValueTag condition = pop(&checker->stack);
+
+    if (condition != BOOLEAN_VALUE) {
+        error(stmnt->token, "Podmienka musi by vyhodnotena boolom");
+    }
+    evaluate(checker, stmnt->body);
 }
 
 static void binary_expression(SemanticChecker* checker, BinaryExpr* expr) {

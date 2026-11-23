@@ -37,13 +37,20 @@ typedef struct {
     Token* token;
 }IfStmnt;
 
+typedef struct {
+    Expr* condition;
+    Stmnt* body;
+    Token* token;
+}WhileStmnt;
+
 typedef enum {
     EXPR_STMNT,
     PRINT_STMNT,
     BLOCK_STMNT,
     DECL_STMNT,
     ASSIGN_STMNT,
-    IF_STMNT
+    IF_STMNT,
+    WHILE_STMNT
 }StmntTag;
 
 typedef struct Stmnt {
@@ -55,6 +62,7 @@ typedef struct Stmnt {
         DeclStmnt dec;
         AssignStmnt ass;
         IfStmnt ifs;
+        WhileStmnt whi;
     }as;
 }Stmnt;
 
