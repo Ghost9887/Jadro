@@ -20,6 +20,7 @@ static void binary_expression(SemanticChecker* checker, BinaryExpr* expr);
 static void unary_expression(SemanticChecker* checker, UnaryExpr* expr);
 static void value_expression(SemanticChecker* checker, ValueExpr* expr);
 static void var_expression(SemanticChecker* checker, VariableExpr* expr);
+static void funk_call_expression(SemanticChecker* checker, FunkCallExpr* expr);
 static bool is_same_type(ValueTag a, ValueTag b);
 static void create_new_env(SemanticChecker* checker);
 static void destroy_current_env(SemanticChecker* checker);
@@ -56,6 +57,7 @@ static void execute(SemanticChecker* checker, Expr* expr) {
         case UNARY_EXPR: unary_expression(checker, &expr->as.una); break;
         case VALUE_EXPR: value_expression(checker, &expr->as.val); break;
         case VARIABLE_EXPR: var_expression(checker, &expr->as.var); break;
+        case FUNK_CALL_EXPR: funk_call_expression(checker, &expr->as.fun); break;
     }
 }
 
@@ -233,6 +235,12 @@ static void var_expression(SemanticChecker* checker, VariableExpr* expr) {
         error(expr->token, "Premenna neexistuje");
     else {
         push(&checker->stack, var->value);
+    }
+}
+
+static void funk_call_expression(SemanticChecker* checker, FunkCallExpr* expr) {
+    for (unsigned int i = 0; i < expr->params->count; i++) {
+        execute(checker, expr->params->exprs[i]);
     }
 }
 

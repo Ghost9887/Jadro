@@ -33,6 +33,7 @@ static void binary_expression(Compiler* compiler, BinaryExpr* expr);
 static void unary_expression(Compiler* compiler, UnaryExpr* expr);
 static void value_expression(Compiler* compiler, ValueExpr* expr);
 static void var_expression(Compiler* compiler, VariableExpr* expr);
+static void funk_call_expression(Compiler* compiler, FunkCallExpr* expr);
 
 void compile(Compiler* compiler) {
     for (unsigned int i = 0; i < compiler->stmnt_arr->count; i++) {
@@ -117,6 +118,7 @@ static void execute(Compiler* compiler, Expr* expr) {
         case UNARY_EXPR: unary_expression(compiler, &expr->as.una); break;
         case VALUE_EXPR: value_expression(compiler, &expr->as.val); break;
         case VARIABLE_EXPR: var_expression(compiler, &expr->as.var); break;
+        case FUNK_CALL_EXPR: funk_call_expression(compiler, &expr->as.fun); break;
     }
 }
 
@@ -182,9 +184,12 @@ static void while_statement(Compiler* compiler, WhileStmnt* stmnt) {
 }
 
 static void funk_impl_statement(Compiler* compiler, FunkImplStmnt* stmnt) {
+    write_code(compiler, OP_NEW_ENV); //a new virtual scope so name clashing doesnt accour
+    write_code(compiler, OP_DELETE_ENV);
 }
 
 static void return_statement(Compiler* compiler, ReturnStmnt* stmnt) {
+
 }
 
 static void binary_expression(Compiler* compiler, BinaryExpr* expr) {
@@ -220,6 +225,19 @@ static void var_expression(Compiler* compiler, VariableExpr* expr) {
     Value temp = (Value) { .tag = STRING_VALUE, .as = { .s = expr->name } };
     write_value(compiler, &temp);
     write_code(compiler, OP_VAR);
+}
+
+static void funk_call_expression(Compiler* compiler, FunkCallExpr* expr) {
+    for (unsigned int i = 0; i < expr->params->count; i++) {
+        execute(compiler, expr->params->exprs[i]);
+    }
+    Value param_count = (Value) { .tag = INTEGER_VALUE, .as = { .i = expr->params->count - 1 } }; 
+    write_value(compiler, &param_count);
+    Value name = (Value) { .tag = STRING_VALUE, .as = { .s = expr->name } };
+    write_value(compiler, &name);
+    write_code(compiler, OP_FUNK_CALL);
+
+    //JUMPS
 }
 
 static unsigned int get_pos(Compiler* compiler) {
