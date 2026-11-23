@@ -62,7 +62,7 @@ int print_instruction(VM* vm, int offset) {
     OpCode code = (OpCode)vm->bytes[offset];
 
     switch (code) {
-        case OP_NEGATE: return print_simple_instruction("OP_NEGATE", offset);
+        case OP_NEGATE: exit(1); return print_simple_instruction("OP_NEGATE", offset);
         case OP_INTEGER: return print_int_instruction(vm, ++offset);
         case OP_DOUBLE: return print_double_instruction(vm, ++offset);
         case OP_STRING: return print_string_instruction(vm, ++offset);

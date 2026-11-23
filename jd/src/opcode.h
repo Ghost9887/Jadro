@@ -29,6 +29,8 @@ typedef enum {
     OP_IF,
     OP_WHILE,
     OP_JUMP,
+    OP_FUNK_DECL,
+    OP_FUNK_CALL,
     OP_END
 }OpCode;
 
