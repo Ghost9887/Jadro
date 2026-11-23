@@ -27,6 +27,8 @@ static void decl_statement(Compiler* compiler, DeclStmnt* stmnt);
 static void assign_statement(Compiler* compiler, AssignStmnt* stmnt);
 static void if_statement(Compiler* compiler, IfStmnt* stmnt);
 static void while_statement(Compiler* compiler, WhileStmnt* stmnt);
+static void funk_decl_statement(Compiler* compiler, FunkDeclStmnt* stmnt);
+static void return_statement(Compiler* compiler, ReturnStmnt* stmnt);
 static void binary_expression(Compiler* compiler, BinaryExpr* expr);
 static void unary_expression(Compiler* compiler, UnaryExpr* expr);
 static void value_expression(Compiler* compiler, ValueExpr* expr);
@@ -175,6 +177,12 @@ static void while_statement(Compiler* compiler, WhileStmnt* stmnt) {
     fill_jump(compiler, &go_back);
     skip_while.to = get_pos(compiler);
     fill_jump(compiler, &skip_while);
+}
+
+static void funk_decl_statement(Compiler* compiler, FunkDeclStmnt* stmnt) {
+}
+
+static void return_statement(Compiler* compiler, ReturnStmnt* stmnt) {
 }
 
 static void binary_expression(Compiler* compiler, BinaryExpr* expr) {

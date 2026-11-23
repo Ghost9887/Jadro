@@ -42,7 +42,11 @@ void tokenize(Lexer* lexer) {
             case ',': make_token(TOKEN_COMMA, lexer); break;
             case '+': make_token(TOKEN_PLUS, lexer); break;
             case '-': make_token(TOKEN_MINUS, lexer); break;
-            case '/': make_token(TOKEN_SLASH, lexer); break;
+            case '/': 
+                if (match('/', lexer)) {
+                    while (!is_at_end(lexer) && advance(lexer) != '\n') advance(lexer);
+                }else make_token(TOKEN_SLASH, lexer); 
+                break;
             case '*': make_token(TOKEN_STAR, lexer); break;
             case '%': make_token(TOKEN_PERCENT, lexer); break;
             case ';': make_token(TOKEN_SEMICOLON, lexer); break;

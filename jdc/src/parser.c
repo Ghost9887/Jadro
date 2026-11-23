@@ -182,6 +182,7 @@ static Stmnt* while_statement(Parser* parser) {
 }
 
 static Stmnt* funk_decl_statement(Parser* parser) {
+    const int max_params = 256;
     consume(parser, TOKEN_IDENTIFIER, "Ockavany nazov funkcie");
     String name = previous(parser)->lexeme;
     consume(parser, TOKEN_LPAREN, "Ocakavany '('");
@@ -189,6 +190,7 @@ static Stmnt* funk_decl_statement(Parser* parser) {
     StmntArr* stmnts = (StmntArr*)malloc(sizeof(StmntArr));
     initialize_stmnt_arr(stmnts);
     while (!match(parser, 1, TOKEN_RPAREN)) {
+        if (stmnts->count > max_params) parse_error(parser, "Maxmialny pocet parametrov je 256");
         if (stmnts->count > 0) consume(parser, TOKEN_COMMA, "Ocakavany oddelovaci znak ','");
         consume(parser, TOKEN_PREM, "Ocakavana deklaracia premennej");
         consume(parser, TOKEN_IDENTIFIER, "Ocakavany nazov premennej");
