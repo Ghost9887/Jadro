@@ -47,7 +47,7 @@ typedef struct {
     String name;
     StmntArr* params;
     Stmnt* body;
-}FunkDeclStmnt;
+}FunkImplStmnt;
 
 typedef struct {
     Expr* expr;
@@ -61,7 +61,7 @@ typedef enum {
     ASSIGN_STMNT,
     IF_STMNT,
     WHILE_STMNT,
-    FUNK_DECL_STMNT,
+    FUNK_IMPL_STMNT,
     RETURN_STMNT
 }StmntTag;
 
@@ -75,7 +75,7 @@ typedef struct Stmnt {
         AssignStmnt ass;
         IfStmnt ifs;
         WhileStmnt whi;
-        FunkDeclStmnt fun;
+        FunkImplStmnt fun;
         ReturnStmnt ret;
     }as;
 }Stmnt;

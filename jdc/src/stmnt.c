@@ -49,8 +49,8 @@ void print_stmnt(Stmnt* stmnt) {
             print_stmnt(stmnt->as.whi.body);
             printf("} ]");
             break;
-        case FUNK_DECL_STMNT:
-            printf("FunkDeclStmnt[ %.*s (", stmnt->as.fun.name.len, stmnt->as.fun.name.ptr);
+        case FUNK_IMPL_STMNT:
+            printf("FunkImplStmnt[ %.*s (", stmnt->as.fun.name.len, stmnt->as.fun.name.ptr);
             for (int i = 0; i < (int)stmnt->as.fun.params->count; i++) {
                 print_stmnt(stmnt->as.fun.params->stmnts[i]);
                 if (i + 1 < (int)stmnt->as.fun.params->count) printf(", ");

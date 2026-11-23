@@ -14,7 +14,7 @@ static void decl_statement(SemanticChecker* checker, DeclStmnt* stmnt);
 static void assign_statement(SemanticChecker* checker, AssignStmnt* stmnt);
 static void if_statement(SemanticChecker* checker, IfStmnt* stmnt);
 static void while_statement(SemanticChecker* checker, WhileStmnt* stmnt);
-static void funk_decl_statement(SemanticChecker* checker, FunkDeclStmnt* stmnt);
+static void funk_impl_statement(SemanticChecker* checker, FunkImplStmnt* stmnt);
 static void return_statement(SemanticChecker* checker, ReturnStmnt* stmnt);
 static void binary_expression(SemanticChecker* checker, BinaryExpr* expr);
 static void unary_expression(SemanticChecker* checker, UnaryExpr* expr);
@@ -45,7 +45,7 @@ static void evaluate(SemanticChecker* checker, Stmnt* stmnt) {
         case ASSIGN_STMNT: assign_statement(checker, &stmnt->as.ass); break;
         case IF_STMNT: if_statement(checker, &stmnt->as.ifs); break;
         case WHILE_STMNT: while_statement(checker, &stmnt->as.whi); break;
-        case FUNK_DECL_STMNT: funk_decl_statement(checker, &stmnt->as.fun); break;
+        case FUNK_IMPL_STMNT: funk_impl_statement(checker, &stmnt->as.fun); break;
         case RETURN_STMNT: return_statement(checker, &stmnt->as.ret); break;
     }
 }
@@ -122,7 +122,7 @@ static void while_statement(SemanticChecker* checker, WhileStmnt* stmnt) {
     evaluate(checker, stmnt->body);
 }
 
-static void funk_decl_statement(SemanticChecker* checker, FunkDeclStmnt* stmnt) {
+static void funk_impl_statement(SemanticChecker* checker, FunkImplStmnt* stmnt) {
     for (unsigned int i = 0; i < stmnt->params->count; i++) {
         evaluate(checker, stmnt->params->stmnts[i]);
     }

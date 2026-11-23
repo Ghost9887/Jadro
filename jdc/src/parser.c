@@ -12,7 +12,7 @@ static Stmnt* decl_statement(Parser* parser);
 static Stmnt* assign_statement(Parser* parser);
 static Stmnt* if_statement(Parser* parser);
 static Stmnt* while_statement(Parser* parser);
-static Stmnt* funk_decl_statement(Parser* parser);
+static Stmnt* funk_impl_statement(Parser* parser);
 static Stmnt* return_statement(Parser* parser);
 static Expr* expression(Parser* parser);
 static Expr* equality(Parser* parser);
@@ -50,7 +50,7 @@ static Stmnt* statement(Parser* parser) {
     if (match(parser, 1, TOKEN_IDENTIFIER)) return assign_statement(parser);
     if (match(parser, 1, TOKEN_AK)) return if_statement(parser);
     if (match(parser, 1, TOKEN_POKIAL)) return while_statement(parser);
-    if (match(parser, 1, TOKEN_FUNK)) return funk_decl_statement(parser);
+    if (match(parser, 1, TOKEN_FUNK)) return funk_impl_statement(parser);
     if (match(parser, 1, TOKEN_VRATIT)) return return_statement(parser);
     return expr_statement(parser);
 }
@@ -181,7 +181,7 @@ static Stmnt* while_statement(Parser* parser) {
     return stmnt;
 }
 
-static Stmnt* funk_decl_statement(Parser* parser) {
+static Stmnt* funk_impl_statement(Parser* parser) {
     const int max_params = 256;
     consume(parser, TOKEN_IDENTIFIER, "Ockavany nazov funkcie");
     String name = previous(parser)->lexeme;
@@ -217,8 +217,8 @@ static Stmnt* funk_decl_statement(Parser* parser) {
     Stmnt* body = statement(parser);
     Stmnt* stmnt = malloc(sizeof(Stmnt));
     *stmnt = (Stmnt) {
-        .tag = FUNK_DECL_STMNT,
-        .as = { .fun = (FunkDeclStmnt) { .name = name, .params = stmnts, .body = body } }
+        .tag = FUNK_IMPL_STMNT,
+        .as = { .fun = (FunkImplStmnt) { .name = name, .params = stmnts, .body = body } }
     };
 
     return stmnt;

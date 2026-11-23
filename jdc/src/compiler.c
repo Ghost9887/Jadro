@@ -27,7 +27,7 @@ static void decl_statement(Compiler* compiler, DeclStmnt* stmnt);
 static void assign_statement(Compiler* compiler, AssignStmnt* stmnt);
 static void if_statement(Compiler* compiler, IfStmnt* stmnt);
 static void while_statement(Compiler* compiler, WhileStmnt* stmnt);
-static void funk_decl_statement(Compiler* compiler, FunkDeclStmnt* stmnt);
+static void funk_impl_statement(Compiler* compiler, FunkImplStmnt* stmnt);
 static void return_statement(Compiler* compiler, ReturnStmnt* stmnt);
 static void binary_expression(Compiler* compiler, BinaryExpr* expr);
 static void unary_expression(Compiler* compiler, UnaryExpr* expr);
@@ -106,6 +106,8 @@ static void evaluate(Compiler* compiler, Stmnt* stmnt) {
         case ASSIGN_STMNT: assign_statement(compiler, &stmnt->as.ass); break;
         case IF_STMNT: if_statement(compiler, &stmnt->as.ifs); break;
         case WHILE_STMNT: while_statement(compiler, &stmnt->as.whi); break;
+        case FUNK_IMPL_STMNT: funk_impl_statement(compiler, &stmnt->as.fun); break;
+        case RETURN_STMNT: return_statement(compiler, &stmnt->as.ret); break;
     }
 }
 
@@ -179,7 +181,7 @@ static void while_statement(Compiler* compiler, WhileStmnt* stmnt) {
     fill_jump(compiler, &skip_while);
 }
 
-static void funk_decl_statement(Compiler* compiler, FunkDeclStmnt* stmnt) {
+static void funk_impl_statement(Compiler* compiler, FunkImplStmnt* stmnt) {
 }
 
 static void return_statement(Compiler* compiler, ReturnStmnt* stmnt) {
