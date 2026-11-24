@@ -183,14 +183,9 @@ static void while_statement(Compiler* compiler, WhileStmnt* stmnt) {
     fill_jump(compiler, &skip_while);
 }
 
-static void funk_impl_statement(Compiler* compiler, FunkImplStmnt* stmnt) {
-    write_code(compiler, OP_NEW_ENV); //a new virtual scope so name clashing doesnt accour
-    write_code(compiler, OP_DELETE_ENV);
-}
+static void funk_impl_statement(Compiler* compiler, FunkImplStmnt* stmnt) {}
 
-static void return_statement(Compiler* compiler, ReturnStmnt* stmnt) {
-
-}
+static void return_statement(Compiler* compiler, ReturnStmnt* stmnt) {}
 
 static void binary_expression(Compiler* compiler, BinaryExpr* expr) {
     execute(compiler, expr->left);
@@ -227,18 +222,7 @@ static void var_expression(Compiler* compiler, VariableExpr* expr) {
     write_code(compiler, OP_VAR);
 }
 
-static void funk_call_expression(Compiler* compiler, FunkCallExpr* expr) {
-    for (unsigned int i = 0; i < expr->params->count; i++) {
-        execute(compiler, expr->params->exprs[i]);
-    }
-    Value param_count = (Value) { .tag = INTEGER_VALUE, .as = { .i = expr->params->count - 1 } }; 
-    write_value(compiler, &param_count);
-    Value name = (Value) { .tag = STRING_VALUE, .as = { .s = expr->name } };
-    write_value(compiler, &name);
-    write_code(compiler, OP_FUNK_CALL);
-
-    //JUMPS
-}
+static void funk_call_expression(Compiler* compiler, FunkCallExpr* expr) {}
 
 static unsigned int get_pos(Compiler* compiler) {
     fseek(compiler->output_file, 0, SEEK_CUR);

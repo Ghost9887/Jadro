@@ -29,4 +29,5 @@ void free_var_arr(VariableArr* arr) {
         free(arr->variables[i].value);
     }
     free(arr->variables);
+    arr->variables = NULL;
 }

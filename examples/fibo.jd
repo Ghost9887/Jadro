@@ -1,0 +1,14 @@
+prem left = 0;
+prem right = 1;
+
+prem count = 1;
+prem n = 20;
+prem temp;
+vytlac("Fibonacii cisla");
+pokial(count <= n) {
+    temp = left + right;
+    vytlac(temp);
+    left = right;
+    right = temp;
+    count = count + 1;
+}

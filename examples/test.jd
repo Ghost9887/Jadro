@@ -45,7 +45,6 @@ pokial (index < 10) {
 }
 
 //vytlac(add(a, b));  
-
 //fn add(prem a, prem b) {
   //  vratit a + b;
 //}
