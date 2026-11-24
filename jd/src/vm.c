@@ -349,12 +349,13 @@ static void assign_var(VM* vm) {
 
 static void var(VM* vm) {
     Value* name = pop(&vm->stack);
-    push(&vm->stack, get_variable(&vm->env_arr[vm->current_env], &name->as.s)->value);
+    Variable* var = get_variable(&vm->env_arr[vm->current_env], &name->as.s);
+    push(&vm->stack, var->value);
 }
 
 static void create_new_env(VM* vm) {
+    unsigned int parent = vm->current_env;
     unsigned int new = ++vm->current_env;
-    unsigned int parent = vm->current_env - 1;
     new_env(&vm->env_arr[new], &vm->env_arr[parent]);
 }
 
