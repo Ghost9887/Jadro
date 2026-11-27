@@ -1,8 +1,8 @@
 prem left = 0;
 prem right = 1;
-
 prem count = 1;
 prem n = 20;
+
 vytlac("Fibonacii cisla");
 pokial(count <= n) {
     prem temp = left + right;
